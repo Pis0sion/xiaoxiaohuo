@@ -4,6 +4,8 @@
 namespace app\api\repositories;
 
 
+use app\api\utils\Utils;
+
 class IntegralRepositories
 {
     /**
@@ -12,8 +14,9 @@ class IntegralRepositories
      */
     public function proList($malls)
     {
-        $malls::with(['relationsToPics'=>['img','sort']])->select();
+        $list = $malls::with(['relationsToPics'=>['img','sort']])->select();
+        return Utils::renderJson($list);
     }
 
-    
+
 }
