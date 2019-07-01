@@ -52,4 +52,6 @@ class IntegralMalls extends Model
 
 
 
+
+
 }
