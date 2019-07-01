@@ -6,6 +6,7 @@ namespace app\api\controller\v1;
 use app\api\repositories\IntegralRepositories;
 use app\common\model\IntegralMalls;
 use app\lib\exception\ParameterException;
+use think\Request;
 
 /**
  * 积分商城模块api
@@ -43,7 +44,7 @@ class IntegralController
     /**
      * 商品详情
      * @param IntegralMalls $malls
-     * @return string
+     * @return array
      * @route("api/v1/pro/:goods_id/details","post")
      * ->model('goods_id','\app\common\model\IntegralMalls',false)
      * ->middleware('token')
@@ -58,13 +59,27 @@ class IntegralController
     }
     /**
      * 预下单
+
+     *
+     */
+    /**
+     *  预下单
+     * @param Request $request
+     * @param IntegralMalls $malls
      * @route("api/v1/prepare/:goods_id/orders","post")
+     * ->model('goods_id','\app\common\model\IntegralMalls',false)
      * ->middleware('token')
      *
      */
-    public function prepareToPlaceOrders()
+    public function prepareToPlaceOrders(Request $request,IntegralMalls $malls)
     {
-
+        return $this->integral->prepareOrders($request,$malls,function($malls){
+            if($malls->isEmpty())
+                throw new ParameterException(['msg' => '该商品不存在']);
+        },function($num,$stock){
+            if($num >= $stock)
+                throw new ParameterException(['msg' => '库存不足']);
+        });
     }
 
     /**

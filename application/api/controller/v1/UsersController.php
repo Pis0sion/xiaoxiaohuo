@@ -10,6 +10,7 @@ use app\common\model\Banks;
 use app\common\model\BindBankCards;
 use app\common\model\Regions;
 use app\common\model\SmsLogs;
+use app\common\model\UserConsigns;
 use app\lib\enum\IUrls;
 use app\lib\exception\ParameterException;
 use GuzzleHttp\Client;
@@ -201,6 +202,29 @@ class UsersController
     }
 
     /**
+     * 获取用户的默认收货地址
+     * @param UserConsigns $consigns
+     * @return mixed
+     * @route("api/v1/consigns/default","post")
+     * ->middleware('token')
+     *
+     */
+    public function getDefaultConsigns()
+    {
+        return $this->usersRepositories->getDefaultConsigns();
+    }
+
+    // 添加地址
+    public function addConsigns(Request $request,Regions $regions)
+    {
+        return $this->usersRepositories->addUsersConsigns($request,$regions);
+    }
+
+
+
+
+
+    /**
      * 查询团队
      * @param Request $request
      * @return array
@@ -265,8 +289,6 @@ class UsersController
     {
         return $this->usersRepositories->withdrawList();
     }
-
-
 
     /**
      * 获取银行卡列表

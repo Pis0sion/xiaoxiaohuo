@@ -4,12 +4,14 @@
 namespace app\api\repositories;
 
 
+use app\api\traits\Regions;
 use app\api\utils\Utils;
 use app\common\model\Banks;
 use app\common\model\BindBankCards;
 use app\common\model\Users;
 use app\common\validate\BindBankCardValidate;
 use app\common\validate\CertificationValidate;
+use app\common\validate\ConsignsValidate;
 use app\common\validate\NickNameValidate;
 use app\lib\exception\ParameterException;
 use GuzzleHttp\Promise\AggregateException;
@@ -22,6 +24,7 @@ use think\exception\DbException;
  */
 class UsersRepositories
 {
+    use Regions ;
     /**
      * 获取用户信息
      * @return array
@@ -287,20 +290,7 @@ class UsersRepositories
         // 验证验证码
         $smsLogs->isValidCode($request->mobile, $request->smsCode, "bindBankCard");
 
-        $countyRes = $regions->isExist($request->countyId);
-        if (!$countyRes) {
-            throw new ParameterException(['msg' => "请正确选择开户行区、县"]);
-        }
-
-        $cityRes = $regions->isExist($countyRes->parentid);
-        if (!$cityRes) {
-            throw new ParameterException(['msg' => "请正确选择开户行城市"]);
-        }
-
-        $provinceRes = $regions->isExist($cityRes->parentid);
-        if (!$provinceRes) {
-            throw new ParameterException(['msg' => "请正确选择开户行省份"]);
-        }
+        extract($this->obtainRegionsByCountyId($regions,$request->countyId));
 
         $bindBankCards->uid = app()->usersInfo->id;
         $bindBankCards->ubc_num = $request->cardNum;
@@ -494,5 +484,53 @@ class UsersRepositories
         $lists = Banks::where('b_state','1')->select();
         return Utils::renderJson($lists);
     }
+
+    /**
+     * 获取用户的默认收获地址
+     * @return array
+     */
+    public function getDefaultConsigns()
+    {
+        $result = app()->usersInfo->hasUsersDefaultConsigns();
+        return Utils::renderJson($result);
+    }
+
+    /**
+     * 添加地址
+     * @param $request
+     * @param $regions
+     * @return array
+     * @throws ParameterException
+     */
+    public function addUsersConsigns($request,$regions)
+    {
+        (new ConsignsValidate())->goCheck();
+
+        extract($this->obtainRegionsByCountyId($regions,$request->uc_county));
+
+        $userConsign = [
+            'uc_consignee'  => $request->uc_consignee ,
+            'uc_province_id'  => $request->uc_consignee ,
+            'uc_city_id'  => $cityRes->id ,
+            'uc_county_id'  => $provinceRes->id ,
+            'uc_province'  => $provinceRes->areaname ,
+            'uc_city'  => $cityRes->areaname ,
+            'uc_county'  => $countyRes->areaname ,
+            'uc_location'  => $request->uc_location ,
+            'uc_phone'  => $request->uc_phone ,
+            'uc_state'  => 1 ,
+            'uc_create_ip'  => $request->ip() ,
+            'uc_mold'  => 'user' ,
+        ];
+        $result = app()->usersInfo->addUserConsigns($userConsign);
+        if($result) {
+            return Utils::renderJson("添加成功");
+        }
+        throw new ParameterException(['msg' => '添加地址失败']);
+    }
+
+
+
+
 
 }

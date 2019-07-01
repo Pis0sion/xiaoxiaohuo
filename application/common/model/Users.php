@@ -219,6 +219,48 @@ class Users extends Model
     }
 
     /**
+     * 该用户的订单
+     * @return \think\model\relation\HasMany
+     */
+    public function hasIntegralOrders()
+    {
+        return $this->hasMany(OrdersByIntegral::class,"user_id",'id');
+    }
+
+    /**
+     * 用户收货地址列表
+     * @return \think\model\relation\HasMany
+     */
+    public function hasUsersConsigns()
+    {
+        return $this->hasMany(UserConsigns::class,"uid","id")->where('uc_state','1');
+    }
+
+    /**
+     * 添加用户收货地址
+     * @param $consigns
+     * @return false|Model
+     */
+    public function addUserConsigns($consigns)
+    {
+        return $this->hasUsersConsigns()->save($consigns);
+    }
+
+    /**
+     * 获取用户的默认收货地址
+     * @return array|\PDOStatement|string|Model
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function hasUsersDefaultConsigns()
+    {
+        return $this->hasUsersConsigns()->where('uc_is_default','1')->findOrEmpty();
+    }
+
+
+
+    /**
      * @param $value
      * @param $data
      * @return mixed

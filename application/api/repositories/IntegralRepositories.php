@@ -5,6 +5,7 @@ namespace app\api\repositories;
 
 
 use app\api\utils\Utils;
+use app\common\validate\OrdersValidate;
 
 class IntegralRepositories
 {
@@ -56,6 +57,31 @@ class IntegralRepositories
 
         });
     }
+
+    /**
+     * @param $request
+     * @param $malls
+     * @param \Closure $isExist
+     * @param \Closure $isEnough
+     */
+    public function prepareOrders($request,$malls,\Closure $isExist,\Closure $isEnough)
+    {
+        /**
+         * 1  接受id  查询商品库存是否满足条件
+         * 2  计算价格及相应的积分
+         * 3
+         */
+        (new OrdersValidate())->goCheck();
+        $isExist($malls);
+        $isEnough($request->number,$malls->goods_stock);
+
+
+
+        return "123";
+
+    }
+
+
 
 
 }
