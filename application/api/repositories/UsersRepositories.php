@@ -508,7 +508,7 @@ class UsersRepositories
 
         extract($this->obtainRegionsByCountyId($regions,$request->uc_county));
 
-        $userConsign = [
+        $userConsign = array(
             'uc_consignee'  => $request->uc_consignee ,
             'uc_province_id'  => $request->uc_consignee ,
             'uc_city_id'  => $cityRes->id ,
@@ -521,7 +521,8 @@ class UsersRepositories
             'uc_state'  => 1 ,
             'uc_create_ip'  => $request->ip() ,
             'uc_mold'  => 'user' ,
-        ];
+        );
+
         $result = app()->usersInfo->addUserConsigns($userConsign);
         if($result) {
             return Utils::renderJson("添加成功");

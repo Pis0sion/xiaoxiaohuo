@@ -203,7 +203,6 @@ class UsersController
 
     /**
      * 获取用户的默认收货地址
-     * @param UserConsigns $consigns
      * @return mixed
      * @route("api/v1/consigns/default","post")
      * ->middleware('token')
@@ -214,7 +213,16 @@ class UsersController
         return $this->usersRepositories->getDefaultConsigns();
     }
 
-    // 添加地址
+    /**
+     *  添加地址
+     * @param Request $request
+     * @param Regions $regions
+     * @return array
+     * @throws ParameterException
+     * @route("api/v1/add/consign","post")
+     * ->middleware('token')
+     *
+     */
     public function addConsigns(Request $request,Regions $regions)
     {
         return $this->usersRepositories->addUsersConsigns($request,$regions);
