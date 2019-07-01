@@ -22,6 +22,8 @@ class UserConsigns extends Model
 
     protected $autoWriteTimestamp = "datetime" ;
 
+    protected $pk = "uc_id";
+
 
 
 }

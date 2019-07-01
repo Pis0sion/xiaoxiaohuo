@@ -25,67 +25,8 @@ class UsersRepositories
     public function getUsers()
     {
         // 获取用户信息
-        $users = ($this->getUserInfo(app()->usersInfo))();
+        $users = ($this->obtainUserInfos(app()->usersInfo))();
         return Utils::renderJson($users);
-    }
-
-    /**
-     * 获取用户有效的信息
-     * @param $users
-     * @return callable|__anonymous@631
-     */
-    function getUserInfo($users)
-    {
-        return new class($users){
-            public $id ;
-            public $u_phone ;
-            public $u_nickname ;
-            public $grade = "游客";
-            public $u_parent_uid ;
-            public $u_parent_nickname = "无";
-            public $u_head_portrait;
-            public $goods_money = 0.00;
-            public $end_goods_money = 0.00;
-            public $ua_integral_value = 0.00;
-            public $ua_available_value = 0.00;
-            public $in_balance_coin = 0.00;
-            protected $users ;
-            /**
-             *  constructor.
-             * @param $users
-             */
-            public function __construct($users)
-            {
-                $this->users = $users;
-            }
-
-            public function __invoke()
-            {
-                // TODO: Implement __invoke() method.
-                $this->id = $this->users->id ;
-                $this->u_phone = $this->users->u_phone ;
-
-                $this->u_nickname = $this->users->u_nickname ;
-                $this->u_parent_uid = $this->users->u_parent_uid ;
-                $this->u_head_portrait = $this->users->u_head_portrait ;
-                if($this->users->uAgent){
-                    $this->grade = $this->users->uAgent->ua_level;
-                    $this->goods_money  = $this->users->uAgent->goods_money ;
-                    $this->end_goods_money  = $this->users->uAgent->end_goods_money ;
-                }
-                if($this->users->hasParents) {
-                    $this->u_parent_nickname = $this->users->hasParents->u_nickname ;
-                }
-                if($this->users->uAccount) {
-                    $this->ua_integral_value = $this->users->uAccount->ua_integral_value ;
-                    $this->ua_available_value = $this->users->uAccount->ua_available_value ;
-                    $this->in_balance_coin = $this->users->uAccount->in_balance_coin ;
-                }
-
-                return $this ;
-            }
-
-        };
     }
 
     /**
@@ -162,6 +103,7 @@ class UsersRepositories
             }
         });
     }
+
     /**
      * 提交实名认证
      * @param $request
@@ -246,8 +188,8 @@ class UsersRepositories
             return Utils::renderJson("操作成功");
         }
         throw new ParameterException(['msg' => '操作失败']);
-
     }
+
     /**
      * 绑定银行卡
      * @param $request
@@ -285,23 +227,7 @@ class UsersRepositories
 
         extract($this->obtainRegionsByCountyId($regions,$request->countyId));
 
-        $bindBankCards->uid = app()->usersInfo->id;
-        $bindBankCards->ubc_num = $request->cardNum;
-        $bindBankCards->b_id = $request->bankId;
-        $bindBankCards->ubc_name = $bankInfo->bank_name;
-        $bindBankCards->ubc_bank_branch = $request->bankBranch;
-        $bindBankCards->ubc_province_id = $provinceRes->id;
-        $bindBankCards->ubc_city_id = $cityRes->id;
-        $bindBankCards->ubc_county_id = $request->countyId;
-        $bindBankCards->ubc_province = $provinceRes->areaname;
-        $bindBankCards->ubc_city = $cityRes->areaname;
-        $bindBankCards->ubc_county = $countyRes->areaname;
-        $bindBankCards->ubc_flag = $bankFlag;
-        $bindBankCards->ubc_card_type = $cardType;
-        $bindBankCards->ubc_holder = $request->holder;
-        $bindBankCards->ubc_state = 1;
-        $bindBankCards->ubc_is_default = 0;
-        $bindBankCards->ubc_create_ip = $request->ip();
+        $bindBankCards = $this->addBindBankCards($bindBankCards,$request,$provinceRes,$cityRes,$countyRes,$bankInfo,$bankFlag,$cardType);
 
         try {
             if ($bindBankCards->save()) {
@@ -434,6 +360,7 @@ class UsersRepositories
     }
 
     /**
+     * 提现列表
      * @return array
      */
     public function withdrawList()
@@ -463,8 +390,6 @@ class UsersRepositories
         return Utils::renderJson($data);
     }
 
-
-
     /**
      * 获取银行卡列表
      * @return array
@@ -479,12 +404,28 @@ class UsersRepositories
     }
 
     /**
-     * 获取用户的默认收获地址
+     * 获取地址列表
      * @return array
      */
-    public function getDefaultConsigns()
+    public function getAllConsigns()
     {
-        $result = app()->usersInfo->hasUsersDefaultConsigns();
+        $list = app()->usersInfo->hasUsersConsigns ;
+        return Utils::renderJson(compact('list'));
+    }
+
+    /**
+     * 获取用户的默认收获地址
+     * @param $request
+     * @return array
+     */
+    public function getDefaultConsigns($request)
+    {
+        $uc_id= $request->param("uc_id","");
+        if(!empty($uc_id)) {
+            $result = app()->usersInfo->hasUsersConsigns()->where('uc_id',$uc_id)->findOrEmpty();
+        }else{
+            $result = app()->usersInfo->hasUsersDefaultConsigns();
+        }
         return Utils::renderJson($result);
     }
 
@@ -523,7 +464,31 @@ class UsersRepositories
         throw new ParameterException(['msg' => '添加地址失败']);
     }
 
-
+    /**
+     * 设置默认地址
+     * @param $consigns
+     * @param \Closure $strategy
+     * @return array
+     * @throws ParameterException
+     */
+    public function setConsignsToDefault($consigns,\Closure $strategy)
+    {
+        if($consigns->isEmpty() || ($consigns->uc_state != 1) || ($consigns->uc_is_default == 1)) {
+            throw new ParameterException(['msg' => '默认地址不存在或状态不正常']);
+        }
+        $strategy($consigns);
+        // 判断是否存在默认银行卡
+        $default = app()->usersInfo->hasUsersDefaultConsigns();
+        if($default){
+            $default->uc_is_default = 0 ;
+            $default->save();
+        }
+        $consigns->uc_is_default = 1 ;
+        if($consigns->save()){
+            return Utils::renderJson("操作成功");
+        }
+        throw new ParameterException(['msg' => '操作失败']);
+    }
 
 
 

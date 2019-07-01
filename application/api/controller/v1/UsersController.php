@@ -202,15 +202,28 @@ class UsersController
     }
 
     /**
-     * 获取用户的默认收货地址
-     * @return mixed
+     * 获取地址列表
+     * @return array
+     * @route("api/v1/consigns/list","post")
+     * ->middleware('token')
+     *
+     */
+    public function getConsignsList()
+    {
+        return $this->usersRepositories->getAllConsigns();
+    }
+
+    /**
+     * 获取用户的收货地址
+     * @param Request $request
+     * @return array
      * @route("api/v1/consigns/default","post")
      * ->middleware('token')
      *
      */
-    public function getDefaultConsigns()
+    public function getDefaultConsigns(Request $request)
     {
-        return $this->usersRepositories->getDefaultConsigns();
+        return $this->usersRepositories->getDefaultConsigns($request);
     }
 
     /**
@@ -226,6 +239,23 @@ class UsersController
     public function addConsigns(Request $request,Regions $regions)
     {
         return $this->usersRepositories->addUsersConsigns($request,$regions);
+    }
+
+    /**
+     * 设置默认地址
+     * @param UserConsigns $consigns
+     * @return array
+     * @throws ParameterException
+     * @route("api/v1/default/:uc_id/consign","post")
+     * ->model('uc_id','\app\common\model\UserConsigns',false)
+     * ->middleware('token')
+     *
+     */
+    public function setDefaultConsigns(UserConsigns $consigns)
+    {
+        return $this->usersRepositories->setConsignsToDefault($consigns,function($consigns){
+            $this->strategy($consigns);
+        });
     }
 
 
