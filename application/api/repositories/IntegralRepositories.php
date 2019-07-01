@@ -15,7 +15,7 @@ class IntegralRepositories
     public function proList($malls)
     {
         $list = $malls::with(['relationsToPics'=>function($query){
-            $query->field('img','sort');
+            $query->field('img,sort');
         }])->select();
         return Utils::renderJson($list);
     }
