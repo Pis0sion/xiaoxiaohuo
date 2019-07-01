@@ -7,8 +7,8 @@ namespace app\api\repositories;
 class IntegralRepositories
 {
 
-    public function proList()
+    public function proList($malls)
     {
-        return "123456789";
+        return $malls::get(1);
     }
 }

@@ -4,6 +4,7 @@
 namespace app\api\controller\v1;
 
 use app\api\repositories\IntegralRepositories;
+use app\common\model\IntegralMalls;
 
 /**
  * 积分商城模块api
@@ -30,9 +31,9 @@ class IntegralController
      * @route("api/v1/pro/integral/list","get")
      *
      */
-    public function getListByProducts()
+    public function getListByProducts(IntegralMalls $malls)
     {
-        return $this->integral->proList();
+        return $this->integral->proList($malls);
     }
 
 
