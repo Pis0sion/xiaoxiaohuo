@@ -50,7 +50,16 @@ class IntegralMalls extends Model
         return $this->relationsToPics()->saveAll($pics);
     }
 
-
+    /**
+     * 分页获取所有的商品
+     * @param \Closure $condition
+     * @return \think\Paginator
+     * @throws \think\exception\DbException
+     */
+    public function getBatchGoodsByPage(\Closure $condition)
+    {
+        return self::with(['relationsToPics' => $condition ])->paginate(10);
+    }
 
 
 

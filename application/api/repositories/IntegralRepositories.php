@@ -14,9 +14,9 @@ class IntegralRepositories
      */
     public function proList($malls)
     {
-        $list = $malls::with(['relationsToPics'=>function($query){
+        $list = $malls->getBatchGoodsByPage(function($query){
             $query->field('goods_id,img,sort');
-        }])->select();
+        });
         return Utils::renderJson($list);
     }
 
