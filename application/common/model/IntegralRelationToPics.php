@@ -24,7 +24,7 @@ class IntegralRelationToPics extends Model
      */
     protected function base($query)
     {
-        $query->order('sort desc');
+        $query->field('goods_id,img,sort')->order('sort desc');
     }
 
 
