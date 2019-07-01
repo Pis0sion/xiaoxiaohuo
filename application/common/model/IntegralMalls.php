@@ -37,7 +37,7 @@ class IntegralMalls extends Model
      */
     public function relationsToPics()
     {
-        return $this->hasMany(IntegralRelationToPics::class,"goods_id","id");
+        return $this->hasMany(IntegralRelationToPics::class,"goods_id","goods_id");
     }
 
     /**
