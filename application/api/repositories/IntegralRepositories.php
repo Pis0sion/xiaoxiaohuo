@@ -20,7 +20,7 @@ class IntegralRepositories
 
     public function proDetails($malls)
     {
-        $details = $malls::with()
+
     }
 
 
