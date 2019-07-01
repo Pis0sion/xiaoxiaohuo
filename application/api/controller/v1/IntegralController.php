@@ -52,15 +52,8 @@ class IntegralController
     public function productByDetails(IntegralMalls $malls)
     {
         return $this->integral->proDetails($malls,function($malls){
-            $this->isExistByGoods($malls);
+            assert($malls->isEmpty(),"invalid parameters");
         });
-    }
-
-    private function isExistByGoods($malls)
-    {
-        if($malls->isEmpty()){
-            throw new ParameterException(['msg' => '参数不正确']);
-        }
     }
     /**
      * 预下单
