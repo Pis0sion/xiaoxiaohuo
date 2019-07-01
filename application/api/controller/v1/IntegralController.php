@@ -27,7 +27,7 @@ class IntegralController
     }
 
     /**
-     * @route("api/v1/pro/integral/list","post")
+     * @route("api/v1/pro/integral/list","get")
      *
      */
     public function getListByProducts()
