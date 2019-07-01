@@ -12,7 +12,8 @@ class IntegralRepositories
      */
     public function proList($malls)
     {
-        return  $malls::with('relationsToPics')->find(1);
+        $malls::with(['relationsToPics'=>['img','sort']])->select();
     }
 
+    
 }

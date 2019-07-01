@@ -28,6 +28,8 @@ class IntegralController
     }
 
     /**
+     * @param IntegralMalls $malls
+     * @return mixed
      * @route("api/v1/pro/integral/list","get")
      *
      */
