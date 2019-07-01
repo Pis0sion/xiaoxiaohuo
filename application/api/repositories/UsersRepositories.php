@@ -6,16 +6,9 @@ namespace app\api\repositories;
 
 use app\api\traits\Regions;
 use app\api\utils\Utils;
-use app\common\model\Banks;
-use app\common\model\BindBankCards;
-use app\common\model\Users;
-use app\common\validate\BindBankCardValidate;
-use app\common\validate\CertificationValidate;
-use app\common\validate\ConsignsValidate;
-use app\common\validate\NickNameValidate;
+use app\common\model\{Banks,BindBankCards,Users};
+use app\common\validate\{BindBankCardValidate, CertificationValidate, ConsignsValidate, NickNameValidate};
 use app\lib\exception\ParameterException;
-use GuzzleHttp\Promise\AggregateException;
-use think\Db;
 use think\exception\DbException;
 
 /**
