@@ -19,4 +19,13 @@ class IntegralRelationToPics extends Model
 
     protected $pk = "photo_id";
 
+    /**
+     * @param $query
+     */
+    protected function base($query)
+    {
+        $query->order('sort desc');
+    }
+
+
 }

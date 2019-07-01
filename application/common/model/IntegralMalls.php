@@ -21,6 +21,16 @@ class IntegralMalls extends Model
 
     protected $autoWriteTimestamp = true ;
 
+    protected $pk = "goods_id";
+
+    /**
+     * @param $query
+     */
+    protected function base($query)
+    {
+        $query->order('goods_sort desc');
+    }
+
     /**
      * 关联商品图片
      * @return \think\model\relation\HasMany
