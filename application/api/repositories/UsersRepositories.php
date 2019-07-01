@@ -510,9 +510,9 @@ class UsersRepositories
 
         $userConsign = array(
             'uc_consignee'  => $request->uc_consignee ,
-            'uc_province_id'  => $request->uc_consignee ,
+            'uc_province_id'  => $provinceRes->id ,
             'uc_city_id'  => $cityRes->id ,
-            'uc_county_id'  => $provinceRes->id ,
+            'uc_county_id'  => $request->uc_county ,
             'uc_province'  => $provinceRes->areaname ,
             'uc_city'  => $cityRes->areaname ,
             'uc_county'  => $countyRes->areaname ,
