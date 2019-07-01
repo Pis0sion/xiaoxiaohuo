@@ -28,6 +28,7 @@ class IntegralController
     }
 
     /**
+     * 商品列表
      * @param IntegralMalls $malls
      * @return mixed
      * @route("api/v1/pro/integral/list","get")
@@ -38,6 +39,26 @@ class IntegralController
         return $this->integral->proList($malls);
     }
 
+    /**
+     * @param IntegralMalls $malls
+     * @return string
+     * @route("api/v1/pro/:id/details","post")
+     * ->model('id','\app\common\model\IntegralMalls',false)
+     * ->middleware('token')
+     *
+     */
+    public function productByDetails(IntegralMalls $malls)
+    {
+        return $this->integral->proDetails($malls);
+    }
+    /**
+     * @route("api/v1/place/orders","get")
+     *
+     */
+    public function placeOrders()
+    {
+
+    }
 
 
 }

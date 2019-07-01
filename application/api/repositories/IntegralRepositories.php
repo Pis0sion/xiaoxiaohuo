@@ -14,12 +14,14 @@ class IntegralRepositories
      */
     public function proList($malls)
     {
-        $list = $malls->getBatchGoodsByPage(function($query){
-            $query->field('goods_id,img,sort');
-        });
+        $list = $malls->field('good_name,goods_price,goods_integral,goods_img')->paginate(10);
         return Utils::renderJson($list);
     }
 
+    public function proDetails($malls)
+    {
+        $details = $malls::with()
+    }
 
 
 }
