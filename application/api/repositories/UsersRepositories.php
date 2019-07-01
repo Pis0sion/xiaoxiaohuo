@@ -1,0 +1,498 @@
+<?php
+
+
+namespace app\api\repositories;
+
+
+use app\api\utils\Utils;
+use app\common\model\Banks;
+use app\common\model\BindBankCards;
+use app\common\model\Users;
+use app\common\validate\BindBankCardValidate;
+use app\common\validate\CertificationValidate;
+use app\common\validate\NickNameValidate;
+use app\lib\exception\ParameterException;
+use GuzzleHttp\Promise\AggregateException;
+use think\Db;
+use think\exception\DbException;
+
+/**
+ * Class UsersRepositories
+ * @package app\api\repositories
+ */
+class UsersRepositories
+{
+    /**
+     * 获取用户信息
+     * @return array
+     */
+    public function getUsers()
+    {
+        // 获取用户信息
+        $users = ($this->getUserInfo(app()->usersInfo))();
+        return Utils::renderJson($users);
+    }
+
+    /**
+     * 获取用户有效的信息
+     * @param $users
+     * @return callable|__anonymous@631
+     */
+    function getUserInfo($users)
+    {
+        return new class($users){
+            public $id ;
+            public $u_phone ;
+            public $u_nickname ;
+            public $grade = "游客";
+            public $u_parent_uid ;
+            public $u_parent_nickname = "无";
+            public $u_head_portrait;
+            public $goods_money = 0.00;
+            public $end_goods_money = 0.00;
+            public $ua_integral_value = 0.00;
+            public $ua_available_value = 0.00;
+            public $in_balance_coin = 0.00;
+            protected $users ;
+            /**
+             *  constructor.
+             * @param $users
+             */
+            public function __construct($users)
+            {
+                $this->users = $users;
+            }
+
+            public function __invoke()
+            {
+                // TODO: Implement __invoke() method.
+                $this->id = $this->users->id ;
+                $this->u_phone = $this->users->u_phone ;
+
+                $this->u_nickname = $this->users->u_nickname ;
+                $this->u_parent_uid = $this->users->u_parent_uid ;
+                $this->u_head_portrait = $this->users->u_head_portrait ;
+                if($this->users->uAgent){
+                    $this->grade = $this->users->uAgent->ua_level;
+                    $this->goods_money  = $this->users->uAgent->goods_money ;
+                    $this->end_goods_money  = $this->users->uAgent->end_goods_money ;
+                }
+                if($this->users->hasParents) {
+                    $this->u_parent_nickname = $this->users->hasParents->u_nickname ;
+                }
+                if($this->users->uAccount) {
+                    $this->ua_integral_value = $this->users->uAccount->ua_integral_value ;
+                    $this->ua_available_value = $this->users->uAccount->ua_available_value ;
+                    $this->in_balance_coin = $this->users->uAccount->in_balance_coin ;
+                }
+
+                return $this ;
+            }
+
+        };
+    }
+
+    /**
+     * 修改头像
+     * @param $request
+     * @param \Closure $closure
+     * @return array
+     * @throws ParameterException
+     */
+    public function receiveFiles($request,\Closure $closure)
+    {
+        $origin = $origin = "./uploads/".app()->usersInfo->u_head_portrait ;
+        app()->usersInfo->u_head_portrait = app()->Images->init($request)->upload("./uploads") ;
+        if(app()->usersInfo->save()){
+            $closure($origin);
+            return Utils::renderJson("修改成功");
+        }
+        throw new ParameterException(['msg' => '修改失败']);
+    }
+
+    /**
+     * 修改昵称
+     * @param $request
+     * @return array
+     * @throws ParameterException
+     */
+    public function alterUsersNickName($request)
+    {
+        (new NickNameValidate())->goCheck();
+        app()->usersInfo->u_nickname = $request->nickname ;
+        try{
+            $result = app()->usersInfo->save();
+            if($result) {
+                return Utils::renderJson('修改成功');
+            }
+            throw new ParameterException();
+        }catch (\Throwable $e){
+            throw new ParameterException(['msg' => '修改失败']);
+        }
+
+    }
+
+    /**
+     * 查询用户实名认证的信息
+     * @return array
+     */
+    public function getCertifications()
+    {
+        $users = $this->getUserToCertifications(app()->usersInfo->certifications);
+        return Utils::renderJson($users);
+    }
+
+    /**
+     * 获取认证信息
+     * @param $certifications
+     * @return
+     */
+    private function getUserToCertifications($certifications)
+    {
+        return (new class($certifications){
+            public $status = -1 ;
+            public $message = "无实名认证信息" ;
+
+            /**
+             *  constructor.
+             * @param $certifications
+             */
+            public function __construct($certifications)
+            {
+                if(!empty($certifications)){
+                    $this->status = 1 ;
+                    $this->message = $certifications ;
+                }
+            }
+        });
+    }
+    /**
+     * 提交实名认证
+     * @param $request
+     * @param $smsLogs
+     * @param \Closure $closure
+     * @return array
+     * @throws ParameterException
+     */
+    public function certification($request,$smsLogs,\Closure $closure)
+    {
+        (new CertificationValidate())->goCheck();
+        // 验证手机验证码
+        $smsLogs->isValidCode($request->mobile,$request->smsCode,"certification") ;
+        // 验证是否重复提交或者已认证
+        if(app()->usersInfo->certifications) {
+            throw new ParameterException(['msg' => '请勿重复提交']);
+        }
+        $certification = [
+            'ucer_real_name' => $request->realname ,
+            'ucer_ID_num' => $request->idcard ,
+            'ucer_create_ip' => $request->ip() ,
+        ];
+        if(app()->usersInfo->addUsersToCertifications($certification)) {
+            $closure($smsLogs);
+            return Utils::renderJson("提交成功");
+        }
+        throw new ParameterException(['msg' => '提交失败']);
+    }
+
+    /**
+     * 绑定银行卡的信息
+     * @return array
+     */
+    public function bankLists()
+    {
+        $banks = app()->usersInfo->usersBankCards()->field("ubc_id,ubc_name,ubc_num,ubc_is_default,ubc_state")->select();
+        return Utils::renderJson(compact('banks'));
+    }
+
+    /**
+     * 解绑银行卡信息
+     * @param $bindBankCards
+     * @param \Closure $strategy
+     * @return array
+     * @throws ParameterException
+     */
+    public function delBanks($bindBankCards,\Closure  $strategy)
+    {
+        if($bindBankCards->isEmpty() || ($bindBankCards->ubc_state != 1)) {
+            throw new ParameterException(['msg' => '银行卡不存在或状态不正常']);
+        }
+        $strategy($bindBankCards);
+        $bindBankCards->ubc_state = 9 ;
+        $bindBankCards->ubc_is_default = 0 ;
+        if($bindBankCards->save()){
+            return Utils::renderJson("操作成功");
+        }
+        throw new ParameterException(['msg' => '操作失败']);
+    }
+
+    /**
+     * 设置默认的银行卡
+     * @param $bindBankCards
+     * @param \Closure $strategy
+     * @return array
+     * @throws ParameterException
+     */
+    public function setBanksToDefault($bindBankCards,\Closure $strategy)
+    {
+        if($bindBankCards->isEmpty() || ($bindBankCards->ubc_state != 1) || ($bindBankCards->ubc_is_default == 1)) {
+            throw new ParameterException(['msg' => '银行卡不存在或状态不正常']);
+        }
+        $strategy($bindBankCards);
+        // 判断是否存在默认银行卡
+        $default = app()->usersInfo->usersToDefaultBank();
+        if($default){
+            $default->ubc_is_default = 0 ;
+            $default->save();
+        }
+        $bindBankCards->ubc_is_default = 1 ;
+        if($bindBankCards->save()){
+            return Utils::renderJson("操作成功");
+        }
+        throw new ParameterException(['msg' => '操作失败']);
+
+    }
+    /**
+     * 绑定银行卡
+     * @param $request
+     * @param $bindBankCards
+     * @param $smsLogs
+     * @param $regions
+     * @param $banks
+     * @param \Closure $verify
+     * @return array
+     * @throws ParameterException
+     */
+    public function bindBankCard($request, $bindBankCards,$smsLogs,$regions,$banks,\Closure $verify)
+    {
+        // 验证
+        (new BindBankCardValidate())->goCheck();
+        // 验证是否绑定该银行卡
+        if ($bindBankCards->isExist($request->cardNum, app()->usersInfo->id)) {
+            throw new ParameterException(['msg' => "请不要重复添加银行卡"]);
+        }
+        $bankInfo = $banks::get(function ($query) use ($request) {
+            $query->where(['b_id' => $request->bankId, 'b_state' => 1]);
+        });
+        if (!$bankInfo) {
+            throw new ParameterException(['msg' => "请正确选择开户行！"]);
+        }
+        // 验证卡号是否正常
+        $user_banks = $verify($request->cardNum);
+        if (!$user_banks->validated) {
+            throw new ParameterException(['msg' => "请输入有效的银行卡号"]);
+        }
+        $cardType = $user_banks->cardType;  //卡类型：DC|储蓄卡，CC|信用卡，PC|预付费卡，SCC|准贷记卡
+        $bankFlag = $user_banks->bank;  //银行标识码
+        // 验证验证码
+        $smsLogs->isValidCode($request->mobile, $request->smsCode, "bindBankCard");
+
+        $countyRes = $regions->isExist($request->countyId);
+        if (!$countyRes) {
+            throw new ParameterException(['msg' => "请正确选择开户行区、县"]);
+        }
+
+        $cityRes = $regions->isExist($countyRes->parentid);
+        if (!$cityRes) {
+            throw new ParameterException(['msg' => "请正确选择开户行城市"]);
+        }
+
+        $provinceRes = $regions->isExist($cityRes->parentid);
+        if (!$provinceRes) {
+            throw new ParameterException(['msg' => "请正确选择开户行省份"]);
+        }
+
+        $bindBankCards->uid = app()->usersInfo->id;
+        $bindBankCards->ubc_num = $request->cardNum;
+        $bindBankCards->b_id = $request->bankId;
+        $bindBankCards->ubc_name = $bankInfo->bank_name;
+        $bindBankCards->ubc_bank_branch = $request->bankBranch;
+        $bindBankCards->ubc_province_id = $provinceRes->id;
+        $bindBankCards->ubc_city_id = $cityRes->id;
+        $bindBankCards->ubc_county_id = $request->countyId;
+        $bindBankCards->ubc_province = $provinceRes->areaname;
+        $bindBankCards->ubc_city = $cityRes->areaname;
+        $bindBankCards->ubc_county = $countyRes->areaname;
+        $bindBankCards->ubc_flag = $bankFlag;
+        $bindBankCards->ubc_card_type = $cardType;
+        $bindBankCards->ubc_holder = $request->holder;
+        $bindBankCards->ubc_state = 1;
+        $bindBankCards->ubc_is_default = 0;
+        $bindBankCards->ubc_create_ip = $request->ip();
+
+        try {
+            if ($bindBankCards->save()) {
+                $smsLogs->setUsedState($request->mobile, "bindBankCard");
+                return Utils::renderJson("绑定成功");
+            }
+            throw new ParameterException();
+        } catch (\Throwable $e) {
+            throw new ParameterException(['msg' => '绑定失败']);
+        }
+    }
+
+    /**
+     * @param $request
+     * @return array
+     * @throws DbException
+     * @throws ParameterException
+     */
+    public function getUsesToDirect($request)
+    {
+        $ids = app()->usersInfo->hasMembers->column("id");
+        $jiantui_count = 0 ;
+        $zhitui_count = count($ids);
+        if($zhitui_count != 0) {
+
+            $jiantui_count = Users::field("id,u_level,u_nickname,u_head_portrait,u_phone,u_create_time")
+                ->whereIn('u_parent_uid',implode(",",$ids))
+                ->count();
+        }
+        $data = [];
+        $type = $request->param("type",'zhitui');
+        if($type == "zhitui"){
+
+            $users = app()->usersInfo->hasMembers()->field("id,u_level,u_nickname,u_head_portrait,u_phone,u_create_time")->paginate(10);
+            if($users->getCurrentPage() == 1) {
+                $data['total'] = $users->total();
+                $data['total_page'] = ceil($data['total'] / 10);
+            }
+            $data['users'] = $users->getCollection() ;
+        }elseif($type == "jiantui"){
+            if($zhitui_count != 0) {
+                $users = Users::field("id,u_level,u_nickname,u_head_portrait,u_phone,u_create_time")
+                    ->whereIn('u_parent_uid',implode(",",$ids))
+                    ->paginate(10);
+                if($users->getCurrentPage() == 1) {
+                    $data['total'] = $users->total(); ;
+                    $data['total_page'] = ceil($data['total'] / 10);
+                }
+                $data['users'] = $users->getCollection() ;
+            }else{
+                $data['total'] = 0 ;
+                $data['total_page'] = 0 ;
+                $data['users'] = [] ;
+            }
+        }else{
+            throw new ParameterException(['msg' => '参数不合法']);
+        }
+        return Utils::renderJson(compact('zhitui_count','jiantui_count','data')) ;
+
+    }
+
+    /**
+     * 获取默认银行卡
+     * @return array
+     */
+    public function getUsersToDefaultBanks($request)
+    {
+        $bc_id= $request->param("bc_id","");
+        if(!empty($bc_id)) {
+            $bank = BindBankCards::get($bc_id);
+            return Utils::renderJson(compact('bank'));
+        }
+        $bank =app()->usersInfo->usersToDefaultBank();
+        return Utils::renderJson(compact('bank'));
+    }
+
+    /**
+     * @param $request
+     * @return array
+     * @throws ParameterException
+     */
+    public function getUserProfitLog($request)
+    {
+        $time = $request->param("year_month"," ") ;
+        if($time == " ") {
+            throw new ParameterException(['msg' => '参数不对']);
+        }
+        $totalProfit = app()->usersInfo->balanceLogs()->sum('number');
+        $start_time = $time."-01" ;
+        $end_time = $time."-31";
+        $details = app()->usersInfo->balanceLogs()->whereBetweenTime('createtime',$start_time,$end_time)->order("createtime desc")->select();
+        $data['totalProfit'] = $totalProfit ;
+        $data['details'] = $details;
+        return Utils::renderJson($data);
+
+    }
+
+    /**
+     * 积分列表
+     * @return array
+     */
+    public function getUseruaIntegrals()
+    {
+        $totalProfit = app()->usersInfo->integralLogs()->sum('number');
+        $details = app()->usersInfo->integralLogs()->field("desc,createtime,number")->order("createtime desc")->paginate(10);
+        if($details->getCurrentPage() == 1) {
+            $data['total'] = $details->total(); ;
+            $data['total_page'] = ceil($data['total'] / 10);
+        }
+        $data['details'] = $details->getCollection();
+        $data['total_score'] = $totalProfit ;
+        return Utils::renderJson($data);
+    }
+
+    /**
+     * 推荐奖励
+     * @return array
+     */
+    public function getTeamProfits()
+    {
+        $totalProfit = app()->usersInfo->profitsLogs()->sum('pl_money');
+        $details = app()->usersInfo->profitsLogs()->field("pl_remark,earnings_type,pl_create_time,pl_money,pl_buyer_id")->order("pl_create_time desc")->paginate(10);
+        if($details->getCurrentPage() == 1) {
+            $data['total'] = $details->total(); ;
+            $data['total_page'] = ceil($data['total'] / 10);
+        }
+        $data['details'] = $details->getCollection();
+        $data['total_profit'] = $totalProfit ;
+        return Utils::renderJson($data);
+    }
+
+    /**
+     * @return array
+     */
+    public function withdrawList()
+    {
+        $totalProfit = app()->usersInfo->withdraws()->sum('wo_money');
+
+        $details = app()->usersInfo->withdraws()
+            ->order('wo_create_time desc')->select();
+
+        $data = [];
+
+        foreach ($details as $detail){
+
+            $notAllow = date('Y-m-d',strtotime($detail->wo_create_time)) ;
+            if($notAllow == "2019-03-05" || $notAllow == "2019-03-07")
+            {
+                if ($detail->wo_state == 0){
+                    continue ;
+                }
+            }
+            $data[] = $detail ;
+        }
+
+        $data['details'] = $data;
+        $data['total_profit'] = $totalProfit ;
+
+        return Utils::renderJson($data);
+    }
+
+
+
+    /**
+     * 获取银行卡列表
+     * @return array
+     * @throws DbException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function bankList()
+    {
+        $lists = Banks::where('b_state','1')->select();
+        return Utils::renderJson($lists);
+    }
+
+}
