@@ -42,8 +42,8 @@ class IntegralController
     /**
      * @param IntegralMalls $malls
      * @return string
-     * @route("api/v1/pro/:id/details","post")
-     * ->model('id','\app\common\model\IntegralMalls',false)
+     * @route("api/v1/pro/:goods_id/details","post")
+     * ->model('goods_id','\app\common\model\IntegralMalls',false)
      * ->middleware('token')
      *
      */
