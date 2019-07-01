@@ -17,10 +17,17 @@ class IntegralRepositories
         $list = $malls->field('goods_id,goods_name,goods_price,goods_integral,goods_img')->paginate(10);
         return Utils::renderJson($list);
     }
+
+    /**
+     * 获取商品详情
+     * @param $malls
+     * @param \Closure $isExist
+     * @return array
+     */
     public function proDetails($malls,\Closure $isExist)
     {
         $isExist($malls);
-        return $this->renderDetails($malls);
+        return Utils::renderJson($this->renderDetails($malls));
     }
 
     private function renderDetails($malls)
