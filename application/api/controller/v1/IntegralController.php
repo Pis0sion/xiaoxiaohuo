@@ -52,7 +52,8 @@ class IntegralController
     public function productByDetails(IntegralMalls $malls)
     {
         return $this->integral->proDetails($malls,function($malls){
-            assert($malls->isEmpty(),"invalid parameters");
+            if($malls->isEmpty())
+                throw new ParameterException();
         });
     }
     /**
