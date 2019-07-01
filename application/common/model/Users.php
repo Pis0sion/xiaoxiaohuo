@@ -233,7 +233,9 @@ class Users extends Model
      */
     public function hasUsersConsigns()
     {
-        return $this->hasMany(UserConsigns::class,"uid","id")->where('uc_state','1');
+        return $this->hasMany(UserConsigns::class,"uid","id")
+            ->field('uc_id,uc_consignee,uc_province_id,uc_city_id,uc_county_id,uc_province,uc_city,uc_county,uc_location,uc_phone,uc_is_default')
+            ->where('uc_state','1');
     }
 
     /**
@@ -255,10 +257,11 @@ class Users extends Model
      */
     public function hasUsersDefaultConsigns()
     {
-        return $this->hasUsersConsigns()->where('uc_is_default','1')->findOrEmpty();
+        return $this->hasUsersConsigns()
+            ->where('uc_is_default','1')
+            ->field('uc_id,uc_consignee,uc_province_id,uc_city_id,uc_county_id,uc_province,uc_city,uc_county,uc_location,uc_phone,uc_is_default')
+            ->findOrEmpty();
     }
-
-
 
     /**
      * @param $value
