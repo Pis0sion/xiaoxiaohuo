@@ -5,6 +5,7 @@ namespace app\api\controller\v1;
 
 use app\api\repositories\IntegralRepositories;
 use app\common\model\IntegralMalls;
+use app\lib\exception\ParameterException;
 
 /**
  * 积分商城模块api
@@ -40,6 +41,7 @@ class IntegralController
     }
 
     /**
+     * 商品详情
      * @param IntegralMalls $malls
      * @return string
      * @route("api/v1/pro/:goods_id/details","post")
@@ -49,11 +51,32 @@ class IntegralController
      */
     public function productByDetails(IntegralMalls $malls)
     {
-        return $this->integral->proDetails($malls);
+        return $this->integral->proDetails($malls,function($malls){
+            $this->isExistByGoods($malls);
+        });
+    }
+
+    private function isExistByGoods($malls)
+    {
+        if(!$malls){
+            throw new ParameterException(['msg' => '参数不正确']);
+        }
     }
     /**
      * 预下单
-     * @route("api/v1/place/preorders","post")
+     * @route("api/v1/prepare/:goods_id/orders","post")
+     * ->middleware('token')
+     *
+     */
+    public function prepareToPlaceOrders()
+    {
+
+    }
+
+    /**
+     * 下单
+     * @route("api/v1/place/:goods_id/orders","post")
+     * ->middleware('token')
      *
      */
     public function placeOrders()

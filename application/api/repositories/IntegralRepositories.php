@@ -17,9 +17,9 @@ class IntegralRepositories
         $list = $malls->field('goods_id,goods_name,goods_price,goods_integral,goods_img')->paginate(10);
         return Utils::renderJson($list);
     }
-
-    public function proDetails($malls)
+    public function proDetails($malls,\Closure $isExist)
     {
+        $isExist($malls);
         return $this->renderDetails($malls);
     }
 
