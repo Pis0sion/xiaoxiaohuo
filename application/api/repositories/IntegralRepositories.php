@@ -9,8 +9,6 @@ class IntegralRepositories
 
     public function proList($malls)
     {
-        $mall = $malls::with('relationsToPics')->find(1);
-
-        return $mall->relationsToPics ;
+        return  $malls::with('relationsToPics')->find(1);
     }
 }
