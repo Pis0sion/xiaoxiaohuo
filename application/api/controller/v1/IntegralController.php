@@ -52,7 +52,8 @@ class IntegralController
         return $this->integral->proDetails($malls);
     }
     /**
-     * @route("api/v1/place/orders","get")
+     * 预下单
+     * @route("api/v1/place/preorders","post")
      *
      */
     public function placeOrders()
