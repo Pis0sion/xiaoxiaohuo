@@ -58,7 +58,7 @@ class IntegralController
 
     private function isExistByGoods($malls)
     {
-        if(!$malls){
+        if($malls->isEmpty()){
             throw new ParameterException(['msg' => '参数不正确']);
         }
     }
