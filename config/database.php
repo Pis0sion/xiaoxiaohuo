@@ -13,13 +13,13 @@ return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-    'hostname'        => 'rm-2zex4oqw0ghjsv6t86o.mysql.rds.aliyuncs.com',
+    'hostname'        => '47.95.9.36',
     // 数据库名
-    'database'        => 'xxh',
+    'database'        => 'xiaoxiao',
     // 用户名
-    'username'        => 'xxh',
+    'username'        => 'root',
     // 密码
-    'password'        => 'Xhlm7894561230',
+    'password'        => '123456',
     // 端口
     'hostport'        => '3306',
     // 连接dsn
