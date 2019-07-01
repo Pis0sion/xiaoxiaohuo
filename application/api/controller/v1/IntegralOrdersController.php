@@ -27,8 +27,14 @@ class IntegralOrdersController
     {
         $this->ordersRepositories = $ordersRepositories;
     }
-
-    
+    /**
+     * @route("api/v1/order/integral","get")
+     *
+     */
+    public function demo()
+    {
+        return $this->ordersRepositories->getOrderInfo();
+    }
 
 
 }
