@@ -158,7 +158,7 @@ class IntegralRepositories
             'pay_type'  =>  'alipay' ,
             'shipping_name'  =>  $consigns->uc_consignee ,
             'shipping_mobile'  =>  $consigns->uc_phone ,
-            'shipping_addr'  => $consigns->uc_consignee->uc_province.$consigns->uc_consignee->uc_city.$consigns->uc_consignee->uc_county.$consigns->uc_consignee->uc_location,
+            'shipping_addr'  => $consigns->uc_province.$consigns->uc_city.$consigns->uc_county.$consigns->uc_location,
             'remark'  =>  $request->remark ,
 
         ];
