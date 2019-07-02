@@ -33,5 +33,15 @@ class OrdersByIntegral extends Model
         return $this->hasMany(OrdersRelationsByGoods::class,"order_id",'order_id');
     }
 
+    /**
+     * 添加订单关联商品
+     * @param $relations
+     * @return false|Model
+     */
+    public function addRelationsToGoods($relations)
+    {
+        return $this->hasManyIntegralGoods()->save($relations);
+    }
+
 
 }
