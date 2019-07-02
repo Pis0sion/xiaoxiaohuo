@@ -93,7 +93,7 @@ class IntegralRepositories
         $mode->setDesc($multiple->tp_desc);
         //  设置兑换比例
         $mode->setProportion($multiple->tp_proportion);
-        
+
         if($mode->isPayable(app()->usersInfo->uAccount->ua_integral_value))
         {
             $list['desc'] = $mode->getDesc() ;
