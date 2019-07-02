@@ -57,10 +57,13 @@ class IntegralController
                 throw new ParameterException();
         });
     }
+
     /**
      *  预下单
      * @param Request $request
      * @param IntegralMalls $malls
+     * @return array
+     * @throws ParameterException
      * @route("api/v1/prepare/:goods_id/orders","post")
      * ->model('goods_id','\app\common\model\IntegralMalls',false)
      * ->middleware('token')
@@ -68,15 +71,6 @@ class IntegralController
      */
     public function prepareToPlaceOrders(Request $request,IntegralMalls $malls)
     {
-        /**
-         * 1 传入商品,用户信息
-         * 2 获取用户的积分信息
-         * 3 推荐金额少的方案 为默认积分方案  否则直接抛出积分不够
-         * 4
-         * 积分和金额的比例 1 : 1
-         * 商品金额 - 类型金额 =  剩余积分 >= 用户现有的积分
-         */
-
         return $this->integral->prepareOrders($request,$malls,function($malls){
             if($malls->isEmpty())
                 throw new ParameterException(['msg' => '该商品不存在']);

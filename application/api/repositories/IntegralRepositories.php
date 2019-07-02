@@ -77,7 +77,7 @@ class IntegralRepositories
         $isEnough($request->number,$malls->goods_stock);
         //  检测积分
         $list = app()->Reflect->getFitMode(app()->usersInfo->uAccount->ua_integral_value,$request->number,$malls);
-       
+
         if(count($list) > 0)
         {
             return Utils::renderJson(compact('list'));
