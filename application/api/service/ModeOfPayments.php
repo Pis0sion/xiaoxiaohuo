@@ -4,7 +4,7 @@
 namespace app\api\service;
 
 
-abstract class ModeOfPayments
+class ModeOfPayments
 {
     /**
      * @var
@@ -114,6 +114,14 @@ abstract class ModeOfPayments
     }
 
     /**
+     * @param mixed $payMoney
+     */
+    public function setPayMoney($payMoney): void
+    {
+        $this->payMoney = $payMoney;
+    }
+
+    /**
      * @return float
      */
     public function getFreight(): float
@@ -165,6 +173,8 @@ abstract class ModeOfPayments
     {
         return $score >= $this->convertToIntegral();
     }
+
+
 
 
 }

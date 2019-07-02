@@ -1,7 +1,6 @@
 <?php
 namespace app\api\service;
 
-use app\common\model\Users;
 use app\lib\enum\IntegralsMode;
 
 /**
@@ -12,26 +11,25 @@ class IntegralsService {
     /**
      * @return array
      */
-	public function integralsOfModes() {
-	    return IntegralsMode::MODE ;
+	public function supportedClass() {
+
 	}
 
     /**
      * @param $type
      * @param $supportedClass
-     * @param array $params
-     * @param bool $needInstance
-     * @return bool|mixed|object
+     * @param mixed ...$params
+     * @return bool|object
      * @throws \ReflectionException
      */
-	public function initClass($type, $supportedClass, $params = [], $needInstance = true) {
+	public function initClass($type, $supportedClass, ... $params) {
 		if(!array_key_exists($type, $supportedClass)) {
 			return false;
 		}
 
 		$className = $supportedClass[$type];
 
-		return $needInstance ? (new \ReflectionClass($className))->newInstanceArgs($params) : $className;
+		return  (new \ReflectionClass($className))->newInstanceArgs($params) ;
 	}
 
     /**

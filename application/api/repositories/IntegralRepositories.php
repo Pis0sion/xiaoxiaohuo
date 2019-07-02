@@ -5,6 +5,7 @@ namespace app\api\repositories;
 
 
 use app\api\utils\Utils;
+use app\common\model\{MultipleTypes,IntegralMalls};
 use app\common\validate\OrdersValidate;
 use app\lib\exception\ParameterException;
 
@@ -66,8 +67,10 @@ class IntegralRepositories
      * @param \Closure $isExistAccount
      * @param \Closure $isExist
      * @param \Closure $isEnough
-     * @return array
      * @throws ParameterException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function prepareOrders($request,$malls,\Closure $isExistAccount,\Closure $isExist,\Closure $isEnough)
     {
@@ -79,26 +82,53 @@ class IntegralRepositories
         //  检测库存
         $isEnough($request->number,$malls->goods_stock);
         //  检测积分
-        $list = app()->Reflect->getFitMode(app()->usersInfo->uAccount->ua_integral_value,$request->number,$malls);
 
-        if(count($list) > 0)
+        $multiple = MultipleTypes::where('id',$request->type)->findOrEmpty();
+
+        $mode = app("Mode",[$request->number,$malls]);
+
+        $mode->setPayMoney($multiple->tp_pay);
+
+        $mode->setDesc($multiple->tp_desc);
+
+        $mode->setProportion($multiple->tp_proportion);
+
+        if($mode->isPayable(app()->usersInfo->uAccount->ua_integral_value))
         {
-            return Utils::renderJson(compact('list'));
+            $list['desc'] = $mode->getDesc() ;
+            $list['total_money'] = $mode->getTotalMoney() ;
+            $list['deduct'] = $mode->getPayableIntegral() ;
+            $list['integral'] = $mode->convertToIntegral() ;
+            $list['freight'] = $mode->getFreight() ;
+            $list['final_money'] = $mode->getPayMoney() ;
+
+            return Utils::renderJson($list);
         }
+
 
         throw new ParameterException(['msg' => '积分不足']);
     }
 
     // 下单
-    public function placeOrders($request)
+    public function placeOrders($request,\Closure $isExistConsigns)
     {
         /**
          *  @params  地址  用户  商品  count   几园区  留言remark
          *
+         *  uc_id
+         *  mode   几园区
+         *  count  个数
+         *  goods_id  商品
+         *
          */
+        // 首先获取地址
+        $consigns = app()->usersInfo->hasUsersConsigns()->where('uc_id',$request->uc_id)->findOrEmpty();
+        // 检测地址
+        $isExistConsigns($consigns);
 
+        $malls = IntegralMalls::where('goods_id',$request->goods_id)->lock(true)->findOrEmpty();
 
-
+        app()->Reflect->initClass($request->mode, app()->Reflect->integralsOfModes,$request->number,$malls );
 
     }
 
