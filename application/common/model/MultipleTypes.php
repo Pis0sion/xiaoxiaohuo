@@ -19,7 +19,7 @@ class MultipleTypes extends Model
 
     protected function base($query)
     {
-        $query->order('sort desc');
+        $query->order('tp_sort desc');
     }
 
 }
