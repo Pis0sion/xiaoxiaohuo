@@ -226,6 +226,7 @@ class IntegralRepositories
                 'order_sn'  => $this->order_sn ,
                 'goods_id'  => $malls->goods_id ,
                 'goods_name'  => $malls->goods_name ,
+                'goods_img'  => $malls->goods_img ,
                 'goods_price'  => $malls->goods_price ,
                 'num'  => $num ,
             ];
