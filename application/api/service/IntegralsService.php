@@ -53,7 +53,7 @@ class IntegralsService {
 
             if($classAttr->isPayable($score)){
 
-                $fits[$key]['desc'] = $classAttr->desc ;
+                $fits[$key]['desc'] = $classAttr->getDesc() ;
             }
 
         }

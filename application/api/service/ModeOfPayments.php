@@ -23,6 +23,11 @@ abstract class ModeOfPayments
      * 比例    money / integral
      */
     protected $proportion = 1.00;
+    /**
+     * @var
+     * 描述
+     */
+    protected $desc ;
 
     /**
      * ModeOfPayments constructor.
@@ -73,6 +78,22 @@ abstract class ModeOfPayments
     public function setProportion($proportion): void
     {
         $this->proportion = $proportion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDesc()
+    {
+        return $this->desc;
+    }
+
+    /**
+     * @param mixed $desc
+     */
+    public function setDesc($desc): void
+    {
+        $this->desc = $desc;
     }
 
     /**
