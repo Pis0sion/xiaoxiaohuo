@@ -54,6 +54,10 @@ class IntegralsService {
             if($classAttr->isPayable($score)){
 
                 $fits[$key]['desc'] = $classAttr->getDesc() ;
+                $fits[$key]['total_money'] = $classAttr->getTotalMoney() ;
+                $fits[$key]['deduct'] = $classAttr->getPayableIntegral() ;
+                $fits[$key]['integral'] = $classAttr->convertToIntegral() ;
+
             }
 
         }

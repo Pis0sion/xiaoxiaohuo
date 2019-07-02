@@ -66,11 +66,6 @@ class IntegralRepositories
      */
     public function prepareOrders($request,$malls,\Closure $isExist,\Closure $isEnough)
     {
-        /**
-         * 1  接受id  查询商品库存是否满足条件
-         * 2  计算价格及相应的积分
-         * 3
-         */
         (new OrdersValidate())->goCheck();
 
 
