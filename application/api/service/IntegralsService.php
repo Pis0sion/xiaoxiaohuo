@@ -49,7 +49,7 @@ class IntegralsService {
 
         foreach ($this->integralsOfModes() as $key => $value)
         {
-            $classAttr = (new \ReflectionClass($value))->newInstanceArgs(...$params) ;
+            $classAttr = (new \ReflectionClass($value))->newInstanceArgs($params) ;
 
             if($classAttr->isPayable($score)){
 
