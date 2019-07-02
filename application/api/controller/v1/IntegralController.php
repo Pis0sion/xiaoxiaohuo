@@ -71,7 +71,10 @@ class IntegralController
      */
     public function prepareToPlaceOrders(Request $request,IntegralMalls $malls)
     {
-        return $this->integral->prepareOrders($request,$malls,function($malls){
+        return $this->integral->prepareOrders($request,$malls,function ($account){
+            if(!$account)
+                throw new ParameterException(['msg' => '用户无法购买']);
+        },function($malls){
             if($malls->isEmpty())
                 throw new ParameterException(['msg' => '该商品不存在']);
         },function($num,$stock){
@@ -86,9 +89,9 @@ class IntegralController
      * ->middleware('token')
      *
      */
-    public function placeOrders()
+    public function placeOrders(Request $request)
     {
-
+        return $this->integral->placeOrders($request);
     }
 
 

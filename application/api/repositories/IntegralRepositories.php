@@ -63,14 +63,17 @@ class IntegralRepositories
      * 预下单
      * @param $request
      * @param $malls
+     * @param \Closure $isExistAccount
      * @param \Closure $isExist
      * @param \Closure $isEnough
      * @return array
      * @throws ParameterException
      */
-    public function prepareOrders($request,$malls,\Closure $isExist,\Closure $isEnough)
+    public function prepareOrders($request,$malls,\Closure $isExistAccount,\Closure $isExist,\Closure $isEnough)
     {
         (new OrdersValidate())->goCheck();
+        //  检测用户账户
+        $isExistAccount(app()->usersInfo->uAccount);
         //  检测商品
         $isExist($malls);
         //  检测库存
@@ -84,6 +87,18 @@ class IntegralRepositories
         }
 
         throw new ParameterException(['msg' => '积分不足']);
+    }
+
+    // 下单
+    public function placeOrders($request)
+    {
+        /**
+         *  @params  地址  用户  商品  count   几园区  留言remark
+         *
+         */
+
+
+
 
     }
 

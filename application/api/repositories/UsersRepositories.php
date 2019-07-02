@@ -18,6 +18,7 @@ use think\exception\DbException;
 class UsersRepositories
 {
     use Regions ;
+
     /**
      * 获取用户信息
      * @return array
