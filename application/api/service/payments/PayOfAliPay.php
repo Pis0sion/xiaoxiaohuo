@@ -33,7 +33,7 @@ class PayOfAliPay extends IPayChannels
         // TODO: Implement payOrder() method.
         $request = $this->gateWay->purchase();
         $request->setBizContent([
-            'subject'      => $orders->goods_name,
+            'subject'      => "购买商品",
             'out_trade_no' => $orders->order_sn,
             'total_amount' => $orders->order_amount,
         ]);
