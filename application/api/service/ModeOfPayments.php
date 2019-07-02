@@ -24,9 +24,9 @@ abstract class ModeOfPayments
     protected $product ;
     /**
      * @var
-     * 比例    money / integral
+     * 比例    money / integral （0-1）
      */
-    protected $proportion = 1.00;
+    protected $proportion = 0.10;
     /**
      * @var
      * 描述
