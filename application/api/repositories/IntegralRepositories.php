@@ -137,12 +137,8 @@ class IntegralRepositories
         $isEnough($request->number,$malls->goods_stock);
 
         $mode = app("Mode",[$request->number,$malls]);
-        //  设置支付钱数
-        $mode->setPayMoney($multiple->tp_pay);
-        //  设置描述
-        $mode->setDesc($multiple->tp_desc);
-        //  设置兑换比例
-        $mode->setProportion($multiple->tp_proportion);
+
+        $mode = $this->payCalIntegrals($multiple)->call($mode);
 
         if(!$mode->isPayable(app()->usersInfo->uAccount->ua_integral_value))
         {
@@ -150,7 +146,6 @@ class IntegralRepositories
         }
 
         $orders = [
-
             'order_sn'  =>  Utils::makeResquestNo() ,
             'goods_price'  =>  $mode->getTotalMoney() ,
             'shipping_fee'  =>  $mode->getFreight() ,
@@ -160,16 +155,31 @@ class IntegralRepositories
             'shipping_mobile'  =>  $consigns->uc_phone ,
             'shipping_addr'  => $consigns->uc_province.$consigns->uc_city.$consigns->uc_county.$consigns->uc_location,
             'remark'  =>  $request->remark ,
-
         ];
 
         if(app()->usersInfo->placeOrders($orders)) {
             return Utils::renderJson("下单成功");
         }
-
         throw new ParameterException(['msg' => '下单失败']);
+    }
 
+    /**
+     * 设置积分分区
+     * @param $multiple
+     * @return \Closure
+     */
+    private function payCalIntegrals($multiple)
+    {
+        return  function()use($multiple){
+            //  设置支付钱数
+            $this->setPayMoney($multiple->tp_pay);
+            //  设置描述
+            $this->setDesc($multiple->tp_desc);
+            //  设置兑换比例
+            $this->setProportion($multiple->tp_proportion);
 
+            return $this ;
+        };
     }
 
 
