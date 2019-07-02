@@ -527,5 +527,26 @@ class UsersRepositories
 
     }
 
+    /**
+     * 删除地址
+     * @param $consigns
+     * @param \Closure $strategy
+     * @return array
+     * @throws ParameterException
+     */
+    public function delUserConsigns($consigns,\Closure $strategy)
+    {
+        if($consigns->isEmpty() || ($consigns->uc_state != 1)) {
+            throw new ParameterException(['msg' => '收货地址不存在或状态不正常']);
+        }
+        $strategy($consigns);
+        $consigns->uc_state = 9 ;
+        $consigns->uc_is_default = 0 ;
+        if($consigns->save()){
+            return Utils::renderJson("删除成功");
+        }
+        throw new ParameterException(['msg' => '删除失败']);
+    }
+
 
 }

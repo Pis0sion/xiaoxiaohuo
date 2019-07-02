@@ -276,10 +276,21 @@ class UsersController
         });
     }
 
-    //  删除用户地址
-    public function delUserConsigns()
+    /**
+     * 删除用户地址
+     * @param UserConsigns $consigns
+     * @return array
+     * @throws ParameterException
+     * @route("api/v1/del/:uc_id/consign","post")
+     * ->model('uc_id','\app\common\model\UserConsigns',false)
+     * ->middleware('token')
+     *
+     */
+    public function delUserConsigns(UserConsigns $consigns)
     {
-
+        return $this->usersRepositories->delUserConsigns($consigns,function($consigns){
+            $this->strategy($consigns);
+        }) ;
     }
 
     /**
