@@ -21,7 +21,8 @@
         "firebase/php-jwt": "^5.0",
         "vlucas/pikirasa": "^1.0",
         "ext-json": "*",
-        "ext-bcmath": "*"
+        "ext-bcmath": "*",
+        "lokielse/omnipay-alipay": "^3.0"
     },
     "autoload": {
         "psr-4": {
