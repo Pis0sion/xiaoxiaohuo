@@ -57,6 +57,7 @@ class IntegralsService {
                 $fits[$key]['total_money'] = $classAttr->getTotalMoney() ;
                 $fits[$key]['deduct'] = $classAttr->getPayableIntegral() ;
                 $fits[$key]['integral'] = $classAttr->convertToIntegral() ;
+                $fits[$key]['final_money'] = $classAttr->getPayMoney() ;
 
             }
 

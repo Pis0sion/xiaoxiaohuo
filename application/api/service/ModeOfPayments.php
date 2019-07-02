@@ -8,6 +8,7 @@ abstract class ModeOfPayments
 {
 
     protected $payMoney ;
+
     /**
      * @var
      * 商品个数
@@ -94,6 +95,14 @@ abstract class ModeOfPayments
     public function setDesc($desc): void
     {
         $this->desc = $desc;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPayMoney()
+    {
+        return $this->payMoney;
     }
 
     /**
