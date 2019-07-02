@@ -6,6 +6,7 @@ namespace app\api\repositories;
 
 use app\api\utils\Utils;
 use app\common\validate\OrdersValidate;
+use app\lib\exception\ParameterException;
 
 class IntegralRepositories
 {
@@ -59,25 +60,30 @@ class IntegralRepositories
     }
 
     /**
+     * 预下单
      * @param $request
      * @param $malls
      * @param \Closure $isExist
      * @param \Closure $isEnough
+     * @return array
+     * @throws ParameterException
      */
     public function prepareOrders($request,$malls,\Closure $isExist,\Closure $isEnough)
     {
         (new OrdersValidate())->goCheck();
-
-
-        return app()->Reflect->getFitMode(app()->usersInfo->uAccount->ua_integral_value,$request->number,$malls);
-
-
+        //  检测商品
         $isExist($malls);
+        //  检测库存
         $isEnough($request->number,$malls->goods_stock);
+        //  检测积分
+        $list = app()->Reflect->getFitMode(app()->usersInfo->uAccount->ua_integral_value,$request->number,$malls);
+       
+        if(count($list) > 0)
+        {
+            return Utils::renderJson(compact('list'));
+        }
 
-
-
-        return "123";
+        throw new ParameterException(['msg' => '积分不足']);
 
     }
 
