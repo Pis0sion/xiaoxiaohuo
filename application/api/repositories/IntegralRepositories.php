@@ -61,6 +61,15 @@ class IntegralRepositories
     }
 
     /**
+     * 获取支付分类
+     * @return array
+     */
+    public function getMultiples()
+    {
+        return Utils::renderJson(MultipleTypes::all());
+    }
+
+    /**
      * 预下单
      * @param $request
      * @param $malls
@@ -110,25 +119,56 @@ class IntegralRepositories
     }
 
     // 下单
-    public function placeOrders($request,\Closure $isExistConsigns)
+    public function placeOrders($request,\Closure $isLegal,\Closure $isEnough)
     {
-        /**
-         *  @params  地址  用户  商品  count   几园区  留言remark
-         *
-         *  uc_id
-         *  mode   几园区
-         *  count  个数
-         *  goods_id  商品
-         *
-         */
         // 首先获取地址
         $consigns = app()->usersInfo->hasUsersConsigns()->where('uc_id',$request->uc_id)->findOrEmpty();
         // 检测地址
-        $isExistConsigns($consigns);
+        $isLegal($consigns);
 
-        $malls = IntegralMalls::where('goods_id',$request->goods_id)->lock(true)->findOrEmpty();
+        $multiple = MultipleTypes::where('id',$request->type)->findOrEmpty();
+        //  检测分类合法
+        $isLegal($multiple);
 
-        app()->Reflect->initClass($request->mode, app()->Reflect->integralsOfModes,$request->number,$malls );
+        $malls = IntegralMalls::where('goods_id',$request->goods_id)->findOrEmpty();
+        //  检测商品
+        $isLegal($malls);
+        //  检测库存
+        $isEnough($request->number,$malls->goods_stock);
+
+        $mode = app("Mode",[$request->number,$malls]);
+        //  设置支付钱数
+        $mode->setPayMoney($multiple->tp_pay);
+        //  设置描述
+        $mode->setDesc($multiple->tp_desc);
+        //  设置兑换比例
+        $mode->setProportion($multiple->tp_proportion);
+
+        if(!$mode->isPayable(app()->usersInfo->uAccount->ua_integral_value))
+        {
+            throw new ParameterException(['msg' => '积分不足']);
+        }
+
+        $orders = [
+
+            'order_sn'  =>  Utils::makeResquestNo() ,
+            'goods_price'  =>  $mode->getTotalMoney() ,
+            'shipping_fee'  =>  $mode->getFreight() ,
+            'order_amount'  =>  $mode->getPayMoney() ,
+            'pay_type'  =>  'alipay' ,
+            'shipping_name'  =>  $consigns->uc_consignee ,
+            'shipping_mobile'  =>  $consigns->uc_phone ,
+            'shipping_addr'  => $consigns->uc_consignee->uc_province.$consigns->uc_consignee->uc_city.$consigns->uc_consignee->uc_county.$consigns->uc_consignee->uc_location,
+            'remark'  =>  $request->remark ,
+
+        ];
+
+        if(app()->usersInfo->placeOrders($orders)) {
+            return Utils::renderJson("下单成功");
+        }
+
+        throw new ParameterException(['msg' => '下单失败']);
+
 
     }
 

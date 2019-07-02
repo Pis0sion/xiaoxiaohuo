@@ -59,6 +59,17 @@ class IntegralController
     }
 
     /**
+     * 获取支付分类
+     * @return array
+     * @route("api/v1/multiple","post")
+     *
+     */
+    public function getMultipleTypes()
+    {
+        return $this->integral->getMultiples();
+    }
+
+    /**
      * 预下单
      * @param Request $request
      * @param IntegralMalls $malls
@@ -88,13 +99,19 @@ class IntegralController
 
     /**
      * 下单
-     * @route("api/v1/place/:goods_id/orders","post")
+     * @route("api/v1/place/orders","post")
      * ->middleware('token')
      *
      */
     public function placeOrders(Request $request)
     {
-        return $this->integral->placeOrders($request);
+        return $this->integral->placeOrders($request,function($result){
+            if(!$result)
+                throw new ParameterException(['msg' => '数据错误，请联系客户']);
+        },function($num,$stock){
+            if($num >= $stock)
+                throw new ParameterException(['msg' => '库存不足']);
+        });
     }
 
 

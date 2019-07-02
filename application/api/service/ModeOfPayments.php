@@ -26,12 +26,12 @@ class ModeOfPayments
      * @var
      * 比例    money / integral （0-1）
      */
-    protected $proportion = 0.10;
+    protected $proportion = 1.00;
     /**
      * @var
      * 描述
      */
-    protected $desc ;
+    protected $desc = "";
     /**
      * @var float
      * 运费

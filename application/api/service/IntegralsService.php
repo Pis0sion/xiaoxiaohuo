@@ -32,35 +32,4 @@ class IntegralsService {
 		return  (new \ReflectionClass($className))->newInstanceArgs($params) ;
 	}
 
-    /**
-     * @param $score
-     * @param array $params
-     * @return array
-     * @throws \ReflectionException
-     */
-	public function getFitMode($score , ...$params)
-    {
-        $fits = [];
-
-        $is_default = 1 ;
-
-        foreach ($this->integralsOfModes() as $key => $value)
-        {
-            $classAttr = (new \ReflectionClass($value))->newInstanceArgs($params) ;
-
-            if($classAttr->isPayable($score)){
-
-                $fits[$key]['desc'] = $classAttr->getDesc() ;
-                $fits[$key]['total_money'] = $classAttr->getTotalMoney() ;
-                $fits[$key]['deduct'] = $classAttr->getPayableIntegral() ;
-                $fits[$key]['integral'] = $classAttr->convertToIntegral() ;
-                $fits[$key]['freight'] = $classAttr->getFreight() ;
-                $fits[$key]['final_money'] = $classAttr->getPayMoney() ;
-                $fits[$key]['is_default'] = $is_default ;
-                $is_default = 0 ;
-            }
-
-        }
-        return $fits ;
-    }
 }

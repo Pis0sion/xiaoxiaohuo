@@ -234,6 +234,17 @@ class Users extends Model
     }
 
     /**
+     * 用户下单
+     * @param $order
+     * @return false|Model
+     */
+    public function placeOrders($order)
+    {
+        return $this->hasIntegralOrders()->save($order);
+    }
+
+
+    /**
      * 用户收货地址列表
      * @return HasMany
      */
