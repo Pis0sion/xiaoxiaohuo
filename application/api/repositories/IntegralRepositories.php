@@ -182,7 +182,7 @@ class IntegralRepositories
 
                 Db::commit();
 
-                return Utils::renderJson("下单成功");
+                return Utils::renderJson(compact('order'));
 
             }
         }catch (\Throwable $e){
