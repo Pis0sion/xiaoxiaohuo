@@ -6,11 +6,7 @@ namespace app\api\controller\v1;
 
 use app\api\repositories\UsersRepositories;
 use app\api\utils\Utils;
-use app\common\model\Banks;
-use app\common\model\BindBankCards;
-use app\common\model\Regions;
-use app\common\model\SmsLogs;
-use app\common\model\UserConsigns;
+use app\common\model\{Banks,BindBankCards,Regions,SmsLogs,UserConsigns};
 use app\lib\enum\IUrls;
 use app\lib\exception\ParameterException;
 use GuzzleHttp\Client;
@@ -49,6 +45,7 @@ class UsersController
     {
         return $this->usersRepositories->getUsers();
     }
+
     /**
      * 获取客服电话
      * @return array
@@ -182,7 +179,6 @@ class UsersController
     {
         return $this->usersRepositories->getUsersToDefaultBanks($request);
     }
-
 
     /**
      * 设置默认的银行卡
@@ -345,7 +341,6 @@ class UsersController
     {
         return $this->usersRepositories->getTeamProfits();
     }
-
 
     /**
      * 提现用户的记录

@@ -72,6 +72,11 @@ class IntegralRepositories
          * 3
          */
         (new OrdersValidate())->goCheck();
+
+
+        return app()->Reflect->getFitMode();
+
+
         $isExist($malls);
         $isEnough($request->number,$malls->goods_stock);
 

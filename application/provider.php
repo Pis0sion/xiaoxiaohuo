@@ -20,4 +20,6 @@ return [
     "Profits"  =>  \app\api\service\ProfitsToParents::class ,
 
     "Grades"   => \app\api\service\AgentsLevelService::class ,
+
+    "Reflect"  =>  \app\api\service\IntegralsService::class ,
 ];

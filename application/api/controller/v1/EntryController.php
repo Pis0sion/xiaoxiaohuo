@@ -4,8 +4,7 @@
 namespace app\api\controller\v1;
 
 use app\api\repositories\EntryRepositories;
-use app\common\model\SmsLogs;
-use app\common\model\Users;
+use app\common\model\{SmsLogs,Users};
 use app\lib\exception\ParameterException;
 use think\Request;
 

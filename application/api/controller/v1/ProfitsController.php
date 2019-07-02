@@ -5,8 +5,7 @@ namespace app\api\controller\v1;
 
 
 use app\api\repositories\ProfitsRepositories;
-use app\common\model\Accounts;
-use app\common\model\ProfitLogs;
+use app\common\model\{Accounts,ProfitLogs};
 use app\lib\exception\ParameterException;
 use think\Request;
 

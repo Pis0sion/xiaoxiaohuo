@@ -5,8 +5,7 @@ namespace app\api\controller\v1;
 
 
 use app\api\repositories\ShopRepositories;
-use app\common\model\Goods;
-use app\common\model\GoodsCategorys;
+use app\common\model\{Goods,GoodsCategorys};
 use think\Request;
 
 /**
