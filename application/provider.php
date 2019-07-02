@@ -22,4 +22,6 @@ return [
     "Grades"   => \app\api\service\AgentsLevelService::class ,
 
     "Mode"  =>  \app\api\service\ModeOfPayments::class ,
+
+    "PayService"  => \app\api\service\payments\PayChannels::class ,
 ];

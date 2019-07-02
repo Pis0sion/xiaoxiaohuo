@@ -5,6 +5,8 @@ namespace app\api\controller\v1;
 
 
 use app\api\repositories\OrdersByIntegralRepositories;
+use app\api\service\PayService;
+use app\common\model\OrdersByIntegral;
 
 /**
  * 订单控制器
@@ -28,12 +30,14 @@ class IntegralOrdersController
         $this->ordersRepositories = $ordersRepositories;
     }
     /**
-     * @route("api/v1/order/integral","get")
+     * @route("api/v1/order/pay","get")
      *
      */
     public function demo()
     {
-        return $this->ordersRepositories->getOrderInfo();
+        $type = "alipay";
+        $order = OrdersByIntegral::get(30);
+        return  (new PayService())->payAction($type,$order);
     }
 
 
