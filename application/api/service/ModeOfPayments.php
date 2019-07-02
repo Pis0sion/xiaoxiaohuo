@@ -6,7 +6,10 @@ namespace app\api\service;
 
 abstract class ModeOfPayments
 {
-
+    /**
+     * @var
+     *  几园区
+     */
     protected $payMoney ;
 
     /**
@@ -29,6 +32,11 @@ abstract class ModeOfPayments
      * 描述
      */
     protected $desc ;
+    /**
+     * @var float
+     * 运费
+     */
+    protected $freight = 0.00 ;
 
     /**
      * ModeOfPayments constructor.
@@ -103,6 +111,22 @@ abstract class ModeOfPayments
     public function getPayMoney()
     {
         return $this->payMoney;
+    }
+
+    /**
+     * @return float
+     */
+    public function getFreight(): float
+    {
+        return $this->freight;
+    }
+
+    /**
+     * @param float $freight
+     */
+    public function setFreight(float $freight): void
+    {
+        $this->freight = $freight;
     }
 
     /**
