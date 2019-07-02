@@ -5,14 +5,16 @@ namespace app\api\repositories;
 
 
 use app\api\utils\Utils;
-use app\common\model\{MultipleTypes,IntegralMalls};
+use app\common\model\{MultipleTypes, IntegralMalls};
 use app\common\validate\OrdersValidate;
+use app\common\validate\PlaceOrdersValidate;
 use app\lib\exception\ParameterException;
 use think\Db;
 
 class IntegralRepositories
 {
     /**
+     * 商品列表
      * @param $malls
      * @return mixed
      */
@@ -28,7 +30,7 @@ class IntegralRepositories
      * @param \Closure $isExist
      * @return array
      */
-    public function proDetails($malls,\Closure $isExist)
+    public function proDetails($malls, \Closure $isExist)
     {
         $isExist($malls);
         return Utils::renderJson($this->renderDetails($malls));
@@ -41,15 +43,16 @@ class IntegralRepositories
      */
     private function renderDetails($malls)
     {
-        return (new class($malls){
+        return (new class($malls)
+        {
 
-            public $banners ;
+            public $banners;
 
-            public $price ;
+            public $price;
 
-            public $goodName ;
+            public $goodName;
 
-            public $goodDesc ;
+            public $goodDesc;
 
             /**
              *  constructor.
@@ -88,7 +91,7 @@ class IntegralRepositories
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function prepareOrders($request,$malls,\Closure $isLegal,\Closure $isExist,\Closure $isEnough)
+    public function prepareOrders($request, $malls, \Closure $isLegal, \Closure $isExist, \Closure $isEnough)
     {
         (new OrdersValidate())->goCheck();
         //  检测用户账户
@@ -96,24 +99,23 @@ class IntegralRepositories
         //  检测商品
         $isExist($malls);
         //  检测库存
-        $isEnough($request->number,$malls->goods_stock);
+        $isEnough($request->number, $malls->goods_stock);
         //  检测积分
-        $multiple = MultipleTypes::where('id',$request->type)->findOrEmpty();
+        $multiple = MultipleTypes::where('id', $request->type)->findOrEmpty();
         //  检测分类合法
         $isLegal($multiple);
         //  实例化商品积分服务类
-        $mode = app("Mode",[$request->number,$malls]);
+        $mode = app("Mode", [$request->number, $malls]);
         //  导入选择的积分分区
         $mode = $this->payCalIntegrals($multiple)->call($mode);
         //  判断是否满足
-        if($mode->isPayable(app()->usersInfo->uAccount->ua_integral_value))
-        {
-            $list['desc'] = $mode->getDesc() ;
-            $list['total_money'] = $mode->getTotalMoney() ;
-            $list['deduct'] = $mode->getPayableIntegral() ;
-            $list['integral'] = $mode->convertToIntegral() ;
-            $list['freight'] = $mode->getFreight() ;
-            $list['final_money'] = $mode->getPayMoney() ;
+        if ($mode->isPayable(app()->usersInfo->uAccount->ua_integral_value)) {
+            $list['desc'] = $mode->getDesc();
+            $list['total_money'] = $mode->getTotalMoney();
+            $list['deduct'] = $mode->getPayableIntegral();
+            $list['integral'] = $mode->convertToIntegral();
+            $list['freight'] = $mode->getFreight();
+            $list['final_money'] = $mode->getPayMoney();
 
             return Utils::renderJson(compact('list'));
         }
@@ -132,64 +134,53 @@ class IntegralRepositories
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function placeOrders($request,\Closure $isLegal,\Closure $isEnough)
+    public function placeOrders($request, \Closure $isLegal, \Closure $isEnough)
     {
+        (new PlaceOrdersValidate())->goCheck();
         // 获取地址
-        $consigns = app()->usersInfo->hasUsersConsigns()->where('uc_id',$request->uc_id)->findOrEmpty();
+        $consigns = app()->usersInfo->hasUsersConsigns()->where('uc_id', $request->uc_id)->findOrEmpty();
         // 检测地址
         $isLegal($consigns);
 
-        $multiple = MultipleTypes::where('id',$request->type)->findOrEmpty();
+        $multiple = MultipleTypes::where('id', $request->type)->findOrEmpty();
         //  检测分类合法
         $isLegal($multiple);
         //  实例化该商品
-        $malls = IntegralMalls::where('goods_id',$request->goods_id)->findOrEmpty();
+        $malls = IntegralMalls::where('goods_id', $request->goods_id)->findOrEmpty();
         //  检测商品
         $isLegal($malls);
         //  检测库存
-        $isEnough($request->number,$malls->goods_stock);
+        $isEnough($request->number, $malls->goods_stock);
         //  实例化商品积分服务类
-        $mode = app("Mode",[$request->number,$malls]);
+        $mode = app("Mode", [$request->number, $malls]);
         //  导入选择的积分分区
         $mode = $this->payCalIntegrals($multiple)->call($mode);
         //  判断选择的积分是否满足
-        if(!$mode->isPayable(app()->usersInfo->uAccount->ua_integral_value))
-        {
+        if (!$mode->isPayable(app()->usersInfo->uAccount->ua_integral_value)) {
             throw new ParameterException(['msg' => '积分不足']);
         }
-
         Db::startTrans();
-
-        try{
-
+        try {
             $orders = [
-
-                'order_sn'  =>  Utils::makeResquestNo() ,
-                'goods_price'  =>  $mode->getTotalMoney() ,
-                'shipping_fee'  =>  $mode->getFreight() ,
-                'order_amount'  =>  $mode->getPayMoney() ,
-                'pay_type'  =>  'alipay' ,
-                'shipping_name'  =>  $consigns->uc_consignee ,
-                'shipping_mobile'  =>  $consigns->uc_phone ,
-                'shipping_addr'  => $consigns->uc_province.$consigns->uc_city.$consigns->uc_county.$consigns->uc_location,
-                'remark'  =>  $request->remark ,
-
+                'order_sn' => Utils::makeResquestNo(),
+                'goods_price' => $mode->getTotalMoney(),
+                'shipping_fee' => $mode->getFreight(),
+                'order_amount' => $mode->getPayMoney(),
+                'pay_type' => 'alipay',
+                'shipping_name' => $consigns->uc_consignee,
+                'shipping_mobile' => $consigns->uc_phone,
+                'shipping_addr' => $consigns->uc_province . $consigns->uc_city . $consigns->uc_county . $consigns->uc_location,
+                'remark' => $request->param('remark',''),
             ];
 
-            if($order = app()->usersInfo->placeOrders($orders)) {
-
-                $this->addRelationsGoods($malls,$request->number)->call($order);
-
+            if ($order = app()->usersInfo->placeOrders($orders)) {
+                $this->addRelationsGoods($malls, $request->number)->call($order);
                 Db::commit();
-
                 return Utils::renderJson(compact('order'));
-
             }
-        }catch (\Throwable $e){
-
+        } catch (\Throwable $e) {
             Db::rollback();
         }
-
         throw new ParameterException(['msg' => '下单失败']);
     }
 
@@ -200,7 +191,7 @@ class IntegralRepositories
      */
     private function payCalIntegrals($multiple)
     {
-        return  function()use($multiple){
+        return function () use ($multiple) {
             //  设置支付钱数
             $this->setPayMoney($multiple->tp_pay);
             //  设置描述
@@ -208,7 +199,7 @@ class IntegralRepositories
             //  设置兑换比例
             $this->setProportion($multiple->tp_proportion);
 
-            return $this ;
+            return $this;
         };
     }
 
@@ -218,23 +209,21 @@ class IntegralRepositories
      * @param $num
      * @return \Closure
      */
-    private function addRelationsGoods($malls,$num)
+    private function addRelationsGoods($malls, $num)
     {
-        return function()use($malls,$num){
+        return function () use ($malls, $num) {
             //  订单关联商品
             $relations = [
-                'order_sn'  => $this->order_sn ,
-                'goods_id'  => $malls->goods_id ,
-                'goods_name'  => $malls->goods_name ,
-                'goods_img'  => $malls->goods_img ,
-                'goods_price'  => $malls->goods_price ,
-                'num'  => $num ,
+                'order_sn' => $this->order_sn,
+                'goods_id' => $malls->goods_id,
+                'goods_name' => $malls->goods_name,
+                'goods_img' => $malls->goods_img,
+                'goods_price' => $malls->goods_price,
+                'num' => $num,
             ];
             return $this->addRelationsToGoods($relations);
         };
     }
-
-
 
 
 
