@@ -2,6 +2,7 @@
 namespace app\api\service;
 
 use app\common\model\Users;
+use app\lib\enum\IntegralsMode;
 
 /**
  * 做一些反射机制有关的 处理
@@ -12,11 +13,7 @@ class IntegralsService {
      * @return array
      */
 	public function integralsOfModes() {
-		return [
-			"one"   => \app\api\service\integrals\IntegralOfModeOne::class,
-			"two"   => \app\api\service\integrals\IntegralOfModeTwo::class,
-			"three" => \app\api\service\integrals\IntegralOfModeThree::class,
-		];
+	    return IntegralsMode::MODE ;
 	}
 
     /**
@@ -47,6 +44,8 @@ class IntegralsService {
     {
         $fits = [];
 
+        $is_default = 1 ;
+
         foreach ($this->integralsOfModes() as $key => $value)
         {
             $classAttr = (new \ReflectionClass($value))->newInstanceArgs($params) ;
@@ -59,7 +58,8 @@ class IntegralsService {
                 $fits[$key]['integral'] = $classAttr->convertToIntegral() ;
                 $fits[$key]['freight'] = $classAttr->getFreight() ;
                 $fits[$key]['final_money'] = $classAttr->getPayMoney() ;
-                
+                $fits[$key]['is_default'] = $is_default ;
+                $is_default = 0 ;
             }
 
         }
