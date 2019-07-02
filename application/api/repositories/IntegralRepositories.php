@@ -74,7 +74,7 @@ class IntegralRepositories
         (new OrdersValidate())->goCheck();
 
 
-        return app()->Reflect->getFitMode();
+        return app()->Reflect->getFitMode(app()->usersInfo->uAccount->ua_integral_value,[$request->number,$malls]);
 
 
         $isExist($malls);
