@@ -9,7 +9,7 @@ use think\Model;
 class MultipleTypes extends Model
 {
 
-    protected $table = "axgy_jfmalls_rules";
+    protected $table = "axgy_jfmall_rules";
 
     protected $createTime = "tp_create_time";
 
