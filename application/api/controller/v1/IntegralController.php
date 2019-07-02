@@ -59,11 +59,14 @@ class IntegralController
     }
 
     /**
-     *  预下单
+     * 预下单
      * @param Request $request
      * @param IntegralMalls $malls
      * @return array
      * @throws ParameterException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      * @route("api/v1/prepare/:goods_id/orders","post")
      * ->model('goods_id','\app\common\model\IntegralMalls',false)
      * ->middleware('token')
@@ -73,7 +76,7 @@ class IntegralController
     {
         return $this->integral->prepareOrders($request,$malls,function ($account){
             if(!$account)
-                throw new ParameterException(['msg' => '用户无法购买']);
+                throw new ParameterException(['msg' => '数据错误，请联系客户']);
         },function($malls){
             if($malls->isEmpty())
                 throw new ParameterException(['msg' => '该商品不存在']);

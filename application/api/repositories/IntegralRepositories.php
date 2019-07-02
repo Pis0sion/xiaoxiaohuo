@@ -64,35 +64,36 @@ class IntegralRepositories
      * 预下单
      * @param $request
      * @param $malls
-     * @param \Closure $isExistAccount
+     * @param \Closure $isLegal
      * @param \Closure $isExist
      * @param \Closure $isEnough
+     * @return array
      * @throws ParameterException
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function prepareOrders($request,$malls,\Closure $isExistAccount,\Closure $isExist,\Closure $isEnough)
+    public function prepareOrders($request,$malls,\Closure $isLegal,\Closure $isExist,\Closure $isEnough)
     {
         (new OrdersValidate())->goCheck();
         //  检测用户账户
-        $isExistAccount(app()->usersInfo->uAccount);
+        $isLegal(app()->usersInfo->uAccount);
         //  检测商品
         $isExist($malls);
         //  检测库存
         $isEnough($request->number,$malls->goods_stock);
         //  检测积分
-
         $multiple = MultipleTypes::where('id',$request->type)->findOrEmpty();
-
+        //  检测分类合法
+        $isLegal($multiple);
         $mode = app("Mode",[$request->number,$malls]);
-
+        //  设置支付钱数
         $mode->setPayMoney($multiple->tp_pay);
-
+        //  设置描述
         $mode->setDesc($multiple->tp_desc);
-
+        //  设置兑换比例
         $mode->setProportion($multiple->tp_proportion);
-
+        
         if($mode->isPayable(app()->usersInfo->uAccount->ua_integral_value))
         {
             $list['desc'] = $mode->getDesc() ;
@@ -102,9 +103,8 @@ class IntegralRepositories
             $list['freight'] = $mode->getFreight() ;
             $list['final_money'] = $mode->getPayMoney() ;
 
-            return Utils::renderJson($list);
+            return Utils::renderJson(compact('list'));
         }
-
 
         throw new ParameterException(['msg' => '积分不足']);
     }
