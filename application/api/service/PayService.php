@@ -45,7 +45,7 @@ class PayService {
      */
 	public function payAction($type,$order)
     {
-        $payChannel = app("PayService",$this->initClass($type,$this->supportedClass()));
+        $payChannel = app("PayService",[$this->initClass($type,$this->supportedClass())]);
         return $payChannel->purchase($order);
     }
 
