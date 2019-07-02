@@ -477,7 +477,7 @@ class UsersRepositories
             throw new ParameterException(['msg' => '默认地址不存在或状态不正常']);
         }
         $strategy($consigns);
-        // 判断是否存在默认银行卡
+        // 判断是否存在默认地址
         $default = app()->usersInfo->hasUsersDefaultConsigns();
         if($default){
             $default->uc_is_default = 0 ;
@@ -490,6 +490,42 @@ class UsersRepositories
         throw new ParameterException(['msg' => '操作失败']);
     }
 
+    /**
+     * 编辑收货地址
+     * @param $request
+     * @param $consigns
+     * @param \Closure $strategy
+     * @return array
+     * @throws ParameterException
+     */
+    public function editConsignsToDefault($request,$consigns,\Closure $strategy)
+    {
+        (new ConsignsValidate())->goCheck();
+        if($consigns->isEmpty() || ($consigns->uc_state != 1)) {
+            throw new ParameterException(['msg' => '默认地址不存在或状态不正常']);
+        }
+        $strategy($consigns);
+
+        ($request->uc_consignee != $consigns->uc_consignee) && ($consigns->uc_consignee = $request->uc_consignee) ;
+        ($request->uc_phone != $consigns->uc_phone) && ($consigns->uc_phone = $request->uc_phone) ;
+        ($request->uc_location != $consigns->uc_location) && ($consigns->uc_location = $request->uc_location) ;
+        if($request->uc_county != $consigns->uc_county_id) {
+            extract($this->obtainRegionsByCountyId(model("Regions"),$request->uc_county));
+            $consigns->uc_province_id = $provinceRes->id ;
+            $consigns->uc_city_id = $cityRes->id ;
+            $consigns->uc_county_id = $request->uc_county ;
+            $consigns->uc_province = $provinceRes->areaname ;
+            $consigns->uc_city = $cityRes->areaname ;
+            $consigns->uc_county = $countyRes->areaname ;
+        }
+
+        if($consigns->save()){
+            return Utils::renderJson("修改成功");
+        }
+
+        throw new ParameterException(['msg' => '修改失败']);
+
+    }
 
 
 }

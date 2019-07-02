@@ -227,7 +227,7 @@ class UsersController
     }
 
     /**
-     *  添加地址
+     * 添加地址
      * @param Request $request
      * @param Regions $regions
      * @return array
@@ -258,6 +258,29 @@ class UsersController
         });
     }
 
+    /**
+     * 编辑用户地址
+     * @param Request $request
+     * @param UserConsigns $consigns
+     * @return array
+     * @throws ParameterException
+     * @route("api/v1/edit/:uc_id/consign","post")
+     * ->model('uc_id','\app\common\model\UserConsigns',false)
+     * ->middleware('token')
+     *
+     */
+    public function editUserConsigns(Request $request , UserConsigns $consigns)
+    {
+        return $this->usersRepositories->editConsignsToDefault($request,$consigns,function($consigns){
+            $this->strategy($consigns);
+        });
+    }
+
+    //  删除用户地址
+    public function delUserConsigns()
+    {
+
+    }
 
     /**
      * 查询团队

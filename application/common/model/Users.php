@@ -5,7 +5,13 @@ namespace app\common\model;
 
 
 use app\lib\enum\Domain;
+use PDOStatement;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 use think\Model;
+use think\model\relation\HasMany;
+use think\model\relation\HasOne;
 
 /**
  * Class Users
@@ -25,7 +31,7 @@ class Users extends Model
 
     /**
      * 用户会员等级
-     * @return \think\model\relation\HasOne
+     * @return HasOne
      */
     public function uAgent()
     {
@@ -44,7 +50,7 @@ class Users extends Model
 
     /**
      * 用户账户
-     * @return \think\model\relation\HasOne
+     * @return HasOne
      */
     public function uAccount()
     {
@@ -63,7 +69,7 @@ class Users extends Model
 
     /**
      * 用户实名信息
-     * @return \think\model\relation\HasOne
+     * @return HasOne
      */
     public function certifications()
     {
@@ -82,7 +88,7 @@ class Users extends Model
 
     /**
      * 用户绑定的银行卡
-     * @return \think\model\relation\HasMany
+     * @return HasMany
      */
     public function usersBankCards()
     {
@@ -91,10 +97,10 @@ class Users extends Model
 
     /**
      * 用户默认的银行
-     * @return array|\PDOStatement|string|Model|null
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @return array|PDOStatement|string|Model|null
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function usersToDefaultBank()
     {
@@ -113,7 +119,7 @@ class Users extends Model
 
     /**
      * 用户提现记录
-     * @return \think\model\relation\HasMany
+     * @return HasMany
      */
     public function withdraws()
     {
@@ -122,10 +128,10 @@ class Users extends Model
 
     /**
      * 未审核提现订单
-     * @return array|\PDOStatement|string|Model|null
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @return array|PDOStatement|string|Model|null
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function isNotWithdraws()
     {
@@ -144,7 +150,7 @@ class Users extends Model
 
     /**
      * 添加分润日志
-     * @return \think\model\relation\HasOne
+     * @return HasOne
      */
     public function divideLogs()
     {
@@ -162,7 +168,7 @@ class Users extends Model
     }
 
     /**
-     * @return \think\model\relation\HasMany
+     * @return HasMany
      */
     public function balanceLogs()
     {
@@ -171,7 +177,7 @@ class Users extends Model
 
     /**
      * 积分记录
-     * @return \think\model\relation\HasMany
+     * @return HasMany
      */
     public function integralLogs()
     {
@@ -180,7 +186,7 @@ class Users extends Model
 
     /**
      * 推广奖励
-     * @return \think\model\relation\HasMany
+     * @return HasMany
      */
     public function profitsLogs()
     {
@@ -202,7 +208,7 @@ class Users extends Model
 
     /**
      * 直推用户
-     * @return \think\model\relation\HasMany
+     * @return HasMany
      */
     public function hasMembers()
     {
@@ -211,7 +217,7 @@ class Users extends Model
 
     /**
      * 父级用户
-     * @return \think\model\relation\HasOne
+     * @return HasOne
      */
     public function hasParents()
     {
@@ -220,7 +226,7 @@ class Users extends Model
 
     /**
      * 该用户的订单
-     * @return \think\model\relation\HasMany
+     * @return HasMany
      */
     public function hasIntegralOrders()
     {
@@ -229,7 +235,7 @@ class Users extends Model
 
     /**
      * 用户收货地址列表
-     * @return \think\model\relation\HasMany
+     * @return HasMany
      */
     public function hasUsersConsigns()
     {
@@ -250,10 +256,10 @@ class Users extends Model
 
     /**
      * 获取用户的默认收货地址
-     * @return array|\PDOStatement|string|Model
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
+     * @return array|PDOStatement|string|Model
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
+     * @throws DbException
      */
     public function hasUsersDefaultConsigns()
     {
