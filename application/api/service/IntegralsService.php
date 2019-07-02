@@ -43,13 +43,13 @@ class IntegralsService {
      * @return array
      * @throws \ReflectionException
      */
-	public function getFitMode($score , $params = [])
+	public function getFitMode($score , ...$params)
     {
         $fits = [];
 
         foreach ($this->integralsOfModes() as $key => $value)
         {
-            $classAttr = (new \ReflectionClass($value))->newInstanceArgs($params) ;
+            $classAttr = (new \ReflectionClass($value))->newInstanceArgs(...$params) ;
 
             if($classAttr->isPayable($score)){
 
