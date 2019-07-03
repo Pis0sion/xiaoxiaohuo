@@ -146,7 +146,7 @@ class OrdersByIntegralRepositories
     {
         $order_status = $request->status ;
 
-        $orders = app()->usersInfo->hasIntegralOrders()->field("");
+        $orders = app()->usersInfo->hasIntegralOrders()->field("order_id,order_sn,order_status,goods_price,order_amount,order_integral,create_time");
 
         if($order_status)
         {
