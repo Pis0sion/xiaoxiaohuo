@@ -334,11 +334,7 @@ class UsersRepositories
     {
         $totalProfit = app()->usersInfo->integralLogs()->sum('number');
         $details = app()->usersInfo->integralLogs()->field("desc,createtime,number")->order("createtime desc")->paginate(10);
-        if($details->getCurrentPage() == 1) {
-            $data['total'] = $details->total(); ;
-            $data['total_page'] = ceil($data['total'] / 10);
-        }
-        $data['details'] = $details->getCollection();
+        $data = Utils::render()->call($details);
         $data['total_score'] = $totalProfit ;
         return Utils::renderJson($data);
     }
@@ -351,11 +347,7 @@ class UsersRepositories
     {
         $totalProfit = app()->usersInfo->profitsLogs()->sum('pl_money');
         $details = app()->usersInfo->profitsLogs()->field("pl_remark,earnings_type,pl_create_time,pl_money,pl_buyer_id")->order("pl_create_time desc")->paginate(10);
-        if($details->getCurrentPage() == 1) {
-            $data['total'] = $details->total(); ;
-            $data['total_page'] = ceil($data['total'] / 10);
-        }
-        $data['details'] = $details->getCollection();
+        $data = Utils::render()->call($details);
         $data['total_profit'] = $totalProfit ;
         return Utils::renderJson($data);
     }

@@ -146,14 +146,14 @@ class OrdersByIntegralRepositories
     {
         $order_status = $request->status ;
 
-        $orders = app()->usersInfo->hasIntegralOrders();
+        $orders = app()->usersInfo->hasIntegralOrders()->field("");
 
         if($order_status)
         {
             $orders = $orders->where('order_status',$order_status);
         }
 
-        return Utils::render()->call($orders->paginate(10)) ;
+        return Utils::renderJson(Utils::render()->call($orders->paginate(10)));
 
     }
 

@@ -32,13 +32,6 @@ class IntegralOrdersController
         $this->ordersRepositories = $ordersRepositories;
     }
 
-    public function demo()
-    {
-        $type = "alipay";
-        $order = OrdersByIntegral::get(30);
-        return  (new PayService())->payAction($type,$order);
-    }
-
     /**
      * 支付
      * @param Request $request
