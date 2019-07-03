@@ -34,11 +34,13 @@ class IntegralRepositories
      * 获取商品详情
      * @param $malls
      * @param \Closure $isExist
+     * @param \Closure $addViews
      * @return array
      */
-    public function proDetails($malls, \Closure $isExist)
+    public function proDetails($malls, \Closure $isExist,\Closure $addViews)
     {
         $isExist($malls);
+        $addViews($malls);
         return Utils::renderJson($this->renderDetails($malls));
     }
 
@@ -86,14 +88,17 @@ class IntegralRepositories
 
         });
     }
-
+    
     /**
      * 获取支付分类
      * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getMultiples()
     {
-        return Utils::renderJson(MultipleTypes::all());
+        return Utils::renderJson(MultipleTypes::field('id,tp_name,tp_sort')->select());
     }
 
     /**

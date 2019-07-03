@@ -55,6 +55,9 @@ class IntegralController
         return $this->integral->proDetails($malls,function($malls){
             if($malls->isEmpty())
                 throw new ParameterException();
+        },function($malls){
+            $malls->views += 1 ;
+            $malls->save();
         });
     }
 
