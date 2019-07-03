@@ -20,7 +20,7 @@ class IntegralRepositories
      */
     public function proList($malls)
     {
-        $list = $malls->field('goods_id,goods_name,goods_price,goods_integral,goods_img')->paginate(10);
+        $list = $malls->field('goods_id,goods_name,goods_price,goods_integral,goods_img,views')->paginate(10);
         return Utils::renderJson($list);
     }
 
