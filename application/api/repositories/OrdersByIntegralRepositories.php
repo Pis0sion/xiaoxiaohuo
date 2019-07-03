@@ -3,6 +3,7 @@
 
 namespace app\api\repositories;
 
+use app\api\service\PayService;
 use app\api\utils\Utils;
 use app\common\model\Accounts;
 use app\common\model\IntegralMalls;
