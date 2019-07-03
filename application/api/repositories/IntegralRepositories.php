@@ -159,8 +159,8 @@ class IntegralRepositories
         if (!$mode->isPayable(app()->usersInfo->uAccount->ua_integral_value)) {
             throw new ParameterException(['msg' => '积分不足']);
         }
-        Db::startTrans();
-        try {
+//        Db::startTrans();
+//        try {
             $orders = [
                 'order_sn' => Utils::makeResquestNo(),
                 'goods_price' => $mode->getTotalMoney(),
@@ -176,12 +176,12 @@ class IntegralRepositories
 
             if ($order = app()->usersInfo->placeOrders($orders)) {
                 $this->addRelationsGoods($malls, $request->number)->call($order);
-                Db::commit();
+                //Db::commit();
                 return Utils::renderJson(compact('order'));
             }
-        } catch (\Throwable $e) {
-            Db::rollback();
-        }
+//        } catch (\Throwable $e) {
+//            Db::rollback();
+//        }
         throw new ParameterException(['msg' => '下单失败']);
     }
 
