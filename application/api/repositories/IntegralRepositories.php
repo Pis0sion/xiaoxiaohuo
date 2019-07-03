@@ -166,6 +166,7 @@ class IntegralRepositories
                 'goods_price' => $mode->getTotalMoney(),
                 'shipping_fee' => $mode->getFreight(),
                 'order_amount' => $mode->getPayMoney(),
+                'order_integral' => $mode->convertToIntegral(),
                 'pay_type' => 'alipay',
                 'shipping_name' => $consigns->uc_consignee,
                 'shipping_mobile' => $consigns->uc_phone,

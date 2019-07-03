@@ -3,6 +3,8 @@
 
 namespace app\api\repositories;
 
+use app\common\validate\PayOrdersValidate;
+
 /**
  * 订单仓库
  * Class OrdersByIntegralRepositories
@@ -14,5 +16,11 @@ class OrdersByIntegralRepositories
     public function getOrderInfo()
     {
         return "456789456789456789";
+    }
+    // 支付
+    public function payOrders()
+    {
+        (new PayOrdersValidate())->goCheck();
+
     }
 }

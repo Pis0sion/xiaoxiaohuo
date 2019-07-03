@@ -40,6 +40,14 @@ class IntegralOrdersController
         return  (new PayService())->payAction($type,$order);
     }
 
+    /**
+     *
+     */
+    public function payAction()
+    {
+        return $this->ordersRepositories->payOrders();
+    }
+
 
 
 }
