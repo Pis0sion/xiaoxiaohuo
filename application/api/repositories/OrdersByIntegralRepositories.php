@@ -60,10 +60,9 @@ class OrdersByIntegralRepositories
                 Accounts::where('uid',$order->user_id)->setField('ua_integral_value',bcsub($userIntegral,$order->order_integral,2));
                 // TODO:  添加日志
 
+                Db::commit();
                 //  订单写入队列
                 $this->writeQueue(compact('order_sn'));
-
-                Db::commit();
 
                 return Utils::renderJson(compact('payUrl'));
 
@@ -72,11 +71,13 @@ class OrdersByIntegralRepositories
 
             Db::rollback();
 
-            if($e instanceof ParameterException) {
+            if($e instanceof ParameterException)
+
                 throw $e ;
-            }
         }
+
         throw new ParameterException(['msg' => '支付失败']);
+
     }
 
     /**
