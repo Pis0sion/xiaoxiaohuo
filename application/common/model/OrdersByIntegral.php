@@ -30,7 +30,7 @@ class OrdersByIntegral extends Model
      */
     public function hasManyIntegralGoods()
     {
-        return $this->hasOne(OrdersRelationsByGoods::class,"order_id",'order_id');
+        return $this->hasOne(OrdersRelationsByGoods::class,"order_id",'order_id')->bind('goods_name');
     }
 
     /**
