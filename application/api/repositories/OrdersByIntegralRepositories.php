@@ -138,9 +138,20 @@ class OrdersByIntegralRepositories
         Log::record($msg,'error');
     }
 
-    public function getAllOrderByConditions()
+    public function getAllOrderByConditions($request)
     {
+        $order_status = $request->status ;
+
+
+        $list = app()->usersInfo->hasIntegralOrders()->field('goods_id,goods_name,goods_price,goods_img,is_pay')->paginate(10);
+
+        return Utils::render()->call($list) ;
+
+        return Utils::renderJson($data);
+
         return app()->usersInfo->hasIntegralOrders->where()->select();
     }
+
+
 
 }

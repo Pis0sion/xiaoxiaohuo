@@ -60,7 +60,12 @@ class IntegralOrdersController
         });
     }
 
-    public function userByOrders()
+    /**
+     * @return mixed
+     *
+     *
+     */
+    public function userOrdersByStatus()
     {
         return $this->ordersRepositories->getAllOrderByConditions();
     }

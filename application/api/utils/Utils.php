@@ -97,4 +97,21 @@ class Utils
         return QueuesService::getInstance();
     }
 
+    /**
+     * @return \Closure
+     */
+    public static function render()
+    {
+        return function()
+        {
+            if($this->getCurrentPage() == 1) {
+                $data['total'] = $this->total(); ;
+                $data['total_page'] = ceil($data['total'] / 10);
+            }
+            $data['list'] = $this->getCollection() ;
+
+            return $data ;
+        };
+    }
+
 }
