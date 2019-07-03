@@ -124,11 +124,11 @@ class IntegralRepositories
         //  检测库存
         $isEnough($request->number, $malls->goods_stock);
         //  检测积分
-        $multiple = MultipleTypes::where('id', $request->type)->findOrEmpty();
+        $multiple = MultipleTypes::where('id', $request->mid)->findOrEmpty();
         //  检测分类合法
         $isLegal($multiple);
         //  实例化商品积分服务类
-        $mode = app("Mode", [$request->number, $malls]);
+        $mode = app("Mode", [$request->count, $malls]);
         //  导入选择的积分分区
         $mode = $this->payCalIntegrals($multiple)->call($mode);
         //  判断是否满足
