@@ -32,6 +32,15 @@ class IntegralMalls extends Model
     }
 
     /**
+     * 商品封面
+     * @return \think\model\relation\HasOne
+     */
+    public function hasCover()
+    {
+        return $this->hasOne(IntegralRelationToPics::class,"photo_id","goods_img")->bind('img');
+    }
+
+    /**
      * 关联商品图片
      * @return \think\model\relation\HasMany
      */
