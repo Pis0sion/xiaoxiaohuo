@@ -12,7 +12,6 @@ use app\common\validate\PayOrdersValidate;
 use app\lib\exception\ParameterException;
 use think\Db;
 use think\facade\Log;
-use think\Request;
 
 /**
  * 订单仓库
@@ -26,7 +25,18 @@ class OrdersByIntegralRepositories
     {
         return "456789456789456789";
     }
-    // 支付
+
+    /**
+     * 支付
+     * @param $request
+     * @param \Closure $isEnough
+     * @return array
+     * @throws ParameterException
+     * @throws \Throwable
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
     public function payOrders($request,\Closure $isEnough)
     {
         (new PayOrdersValidate())->goCheck();
@@ -58,7 +68,13 @@ class OrdersByIntegralRepositories
                 IntegralMalls::where("goods_id",$goods_id)->setField('goods_stock',bcsub($stock,$purchase_count,2));
                 // 减去积分
                 Accounts::where('uid',$order->user_id)->setField('ua_integral_value',bcsub($userIntegral,$order->order_integral,2));
+                // 修改支付状态 支付中
+                $order->order_status = 20 ;
+
+                $order->save();
+
                 // TODO:  添加日志
+
 
                 Db::commit();
                 //  订单写入队列
@@ -81,7 +97,8 @@ class OrdersByIntegralRepositories
     }
 
     /**
-     *
+     * 写入队列
+     * @param $data
      */
     private function writeQueue($data)
     {
@@ -121,4 +138,10 @@ class OrdersByIntegralRepositories
 
         Log::record($msg,'error');
     }
+
+    public function getAllOrderByConditions()
+    {
+        return app()->usersInfo->hasIntegralOrders->where()->select();
+    }
+
 }

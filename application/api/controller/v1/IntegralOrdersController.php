@@ -44,7 +44,12 @@ class IntegralOrdersController
      * @param Request $request
      * @return array
      * @throws ParameterException
+     * @throws \Throwable
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      * @route("api/v1/order/pay","post")
+     * ->middleware('token')
      *
      */
     public function payAction(Request $request)
@@ -55,6 +60,9 @@ class IntegralOrdersController
         });
     }
 
-
+    public function userByOrders()
+    {
+        return $this->ordersRepositories->getAllOrderByConditions();
+    }
 
 }
