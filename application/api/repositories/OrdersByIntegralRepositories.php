@@ -25,7 +25,7 @@ class OrdersByIntegralRepositories
         return "456789456789456789";
     }
     // 支付
-    public function payOrders(Request $request,\Closure $isEnough)
+    public function payOrders($request,\Closure $isEnough)
     {
         (new PayOrdersValidate())->goCheck();
 
