@@ -230,7 +230,7 @@ class Users extends Model
      */
     public function hasIntegralOrders()
     {
-        return $this->hasMany(OrdersByIntegral::class,"user_id",'id');
+        return $this->hasMany(OrdersByIntegral::class,"user_id",'id')->with('hasManyIntegralGoods');
     }
 
     /**
