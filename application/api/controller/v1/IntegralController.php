@@ -33,7 +33,7 @@ class IntegralController
      * 商品列表
      * @param IntegralMalls $malls
      * @return mixed
-     * @route("api/v1/integral/list","get")
+     * @route("api/v1/integral/list","post")
      *
      */
     public function getListByProducts(IntegralMalls $malls)

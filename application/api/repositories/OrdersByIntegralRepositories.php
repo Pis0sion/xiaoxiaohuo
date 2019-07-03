@@ -75,7 +75,6 @@ class OrdersByIntegralRepositories
 
                 // TODO:  添加日志
 
-
                 Db::commit();
                 //  订单写入队列
                 $this->writeQueue(compact('order_sn'));
