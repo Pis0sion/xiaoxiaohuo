@@ -148,7 +148,7 @@ class OrdersByIntegralRepositories
 
         $orders = app()->usersInfo->hasIntegralOrders();
 
-        if(!$order_status)
+        if($order_status)
         {
             $orders = $orders->where('order_status',$order_status);
         }
