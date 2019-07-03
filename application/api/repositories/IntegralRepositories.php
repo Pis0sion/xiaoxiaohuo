@@ -56,6 +56,10 @@ class IntegralRepositories
 
             public $is_pay;
 
+            public $stock;
+
+            public $thumb;
+
             public $goodDesc;
 
             /**
@@ -66,6 +70,8 @@ class IntegralRepositories
             {
                 $this->banners = $malls->relationsToPics;
                 $this->price = $malls->goods_price;
+                $this->stock = $malls->goods_stock;
+                $this->thumb = $malls->goods_thumb;
                 $this->views = $malls->views;
                 $this->is_pay = $malls->is_pay;
                 $this->goodName = $malls->goods_name;
