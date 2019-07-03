@@ -56,11 +56,11 @@ class OrdersByIntegralRepositories
             if($payUrl) {
                 // 减库存
                 IntegralMalls::where("goods_id",$goods_id)->setField('goods_stock',bcsub($stock,$purchase_count,2));
-                halt($order->user_id);
+
                 // 减去积分
                 Accounts::where('uid',$order->user_id)->setField('ua_integral_value',bcsub($userIntegral,$order->order_integral,2));
                 // TODO:  添加日志
-
+                halt(bcsub($userIntegral,$order->order_integral,2));
                 //  订单写入队列
                 $this->writeQueue(compact('order_sn'));
 
