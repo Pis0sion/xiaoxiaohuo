@@ -198,7 +198,7 @@ class IntegralRepositories
             ];
 
             if ($order = app()->usersInfo->placeOrders($orders)) {
-                $this->addRelationsGoods($malls, $request->number)->call($order);
+                $this->addRelationsGoods($malls, $request->count)->call($order);
                 Db::commit();
                 return Utils::renderJson(compact('order'));
             }
