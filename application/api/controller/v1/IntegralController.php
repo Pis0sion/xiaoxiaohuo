@@ -60,10 +60,13 @@ class IntegralController
             $malls->save();
         });
     }
-
+    
     /**
      * 获取支付分类
      * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      * @route("api/v1/multiple","post")
      *
      */

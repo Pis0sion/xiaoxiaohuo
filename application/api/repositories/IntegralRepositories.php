@@ -88,7 +88,7 @@ class IntegralRepositories
 
         });
     }
-    
+
     /**
      * 获取支付分类
      * @return array
