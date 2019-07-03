@@ -138,7 +138,7 @@ class IntegralRepositories
             $list['deduct'] = $mode->getPayableIntegral();
             $list['integral'] = $mode->convertToIntegral();
             $list['freight'] = $mode->getFreight();
-            $list['final_money'] = $mode->getPayMoney();
+            $list['final_money'] = $mode->payMoney();
 
             return Utils::renderJson(compact('list'));
         }

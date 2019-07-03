@@ -147,12 +147,20 @@ class ModeOfPayments
     }
 
     /**
+     * @return string
+     */
+    public function payMoney()
+    {
+        return bcmul($this->payMoney,$this->count,2);
+    }
+
+    /**
      * 应付的金额
      * @return string
      */
     public function getPayableIntegral()
     {
-        return bcsub($this->getTotalMoney(),bcmul($this->payMoney,$this->count,2),2);
+        return bcsub($this->getTotalMoney(),$this->payMoney(),2);
     }
 
     /**
