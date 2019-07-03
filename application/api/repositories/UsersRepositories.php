@@ -422,7 +422,7 @@ class UsersRepositories
     public function getDefaultConsigns($request)
     {
         $uc_id= $request->param("uc_id","");
-        if(!empty($uc_id)) {
+        if(!empty($uc_id) && ($uc_id != 0)) {
             $result = app()->usersInfo->hasUsersConsigns()->where('uc_id',$uc_id)->findOrEmpty();
         }else{
             $result = app()->usersInfo->hasUsersDefaultConsigns();

@@ -60,7 +60,7 @@ class IntegralController
             $malls->save();
         });
     }
-    
+
     /**
      * 获取支付分类
      * @return array
