@@ -26,11 +26,11 @@ class OrdersByIntegral extends Model
 
     /**
      * 订单关联的商品
-     * @return \think\model\relation\HasMany
+     * @return \think\model\relation\HasOne
      */
     public function hasManyIntegralGoods()
     {
-        return $this->hasMany(OrdersRelationsByGoods::class,"order_id",'order_id');
+        return $this->hasOne(OrdersRelationsByGoods::class,"order_id",'order_id');
     }
 
     /**

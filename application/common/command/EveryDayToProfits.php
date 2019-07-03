@@ -46,7 +46,7 @@ class EveryDayToProfits extends Command
                 $stomp->begin("Transaction");
 
                 $stomp->send($queue, json_encode($data), [
-                    'persistent' => true,
+                    'persistent' => 'true',
                     'AMQ_SCHEDULED_DELAY' => 5 * 1000,
                 ]);
 
