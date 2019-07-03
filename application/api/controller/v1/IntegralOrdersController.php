@@ -61,13 +61,16 @@ class IntegralOrdersController
     }
 
     /**
+     * 查询订单
+     * @param Request $request
      * @return mixed
-     *
+     * @route("api/v1/check/orders","post")
+     * ->middleware('token')
      *
      */
-    public function userOrdersByStatus()
+    public function userOrdersByStatus(Request $request)
     {
-        return $this->ordersRepositories->getAllOrderByConditions();
+        return $this->ordersRepositories->getAllOrderByConditions($request);
     }
 
 }
