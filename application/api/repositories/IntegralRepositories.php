@@ -188,7 +188,7 @@ class IntegralRepositories
                 'order_sn' => Utils::makeResquestNo(),
                 'goods_price' => $mode->getTotalMoney(),
                 'shipping_fee' => $mode->getFreight(),
-                'order_amount' => $mode->getPayMoney(),
+                'order_amount' => $mode->payMoney(),
                 'order_integral' => $mode->convertToIntegral(),
                 'pay_type' => 'alipay',
                 'shipping_name' => $consigns->uc_consignee,
