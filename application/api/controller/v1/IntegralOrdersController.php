@@ -29,10 +29,7 @@ class IntegralOrdersController
     {
         $this->ordersRepositories = $ordersRepositories;
     }
-    /**
-     * @route("api/v1/order/pay","get")
-     *
-     */
+
     public function demo()
     {
         $type = "alipay";
@@ -41,6 +38,7 @@ class IntegralOrdersController
     }
 
     /**
+     *@route("api/v1/order/pay","post")
      *
      */
     public function payAction()

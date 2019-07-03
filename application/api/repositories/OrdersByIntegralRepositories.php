@@ -54,7 +54,6 @@ class OrdersByIntegralRepositories
             Accounts::where('uid',$order->user_id)->setField('ua_integral_value',bcsub($userIntegral,$order->order_integral,2));
             // TODO:  添加日志
 
-
             //  订单写入队列
             $this->writeQueue(compact('order_sn'));
 
