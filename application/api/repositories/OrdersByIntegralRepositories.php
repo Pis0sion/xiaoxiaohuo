@@ -38,7 +38,9 @@ class OrdersByIntegralRepositories
         $goods_id = $order->hasManyIntegralGoods->goods_id ;
         //  购买数量
         $purchase_count = $order->hasManyIntegralGoods->num ;
+
         Db::startTrans();
+
         try{
             //  查询该商品的库存量
             $stock = IntegralMalls::where("goods_id",$goods_id)->lock(true)->value('goods_stock');
@@ -67,8 +69,12 @@ class OrdersByIntegralRepositories
 
             }
         }catch (\Throwable $e) {
-            
+
             Db::rollback();
+
+            if($e instanceof ParameterException) {
+                throw $e ;
+            }
         }
         throw new ParameterException(['msg' => '支付失败']);
     }
