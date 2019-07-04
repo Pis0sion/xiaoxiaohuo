@@ -11,6 +11,7 @@ class ConsignsValidate extends BaseValidate
         "uc_phone" => 'require|isMobile',
         "uc_county" => 'require|number',
         "uc_location" => 'require',
+        "is_default" => 'require|in:0,1',
     ];
 
     protected $message = [
@@ -20,5 +21,6 @@ class ConsignsValidate extends BaseValidate
         'uc_county.require' => '缺少重要参数',
         'uc_county.number' => '参数不合法',
         'uc_location.require' => '缺少重要参数',
+        'is_default.require' => '缺少重要参数',
     ];
 }

@@ -234,7 +234,16 @@ class UsersController
      */
     public function addConsigns(Request $request,Regions $regions)
     {
-        return $this->usersRepositories->addUsersConsigns($request,$regions);
+        return $this->usersRepositories->addUsersConsigns($request,$regions,function($request){
+            if($request->is_default  == 1) {
+                // 判断是否存在默认地址
+                $default = app()->usersInfo->hasUsersDefaultConsigns();
+                if(!$default->isEmpty()){
+                    $default->uc_is_default = 0 ;
+                    $default->save();
+                }
+            }
+        });
     }
 
     /**
@@ -269,6 +278,15 @@ class UsersController
     {
         return $this->usersRepositories->editConsignsToDefault($request,$consigns,function($consigns){
             $this->strategy($consigns);
+        },function($request){
+            if($request->is_default  == 1) {
+                // 判断是否存在默认地址
+                $default = app()->usersInfo->hasUsersDefaultConsigns();
+                if(!$default->isEmpty()){
+                    $default->uc_is_default = 0 ;
+                    $default->save();
+                }
+            }
         });
     }
 

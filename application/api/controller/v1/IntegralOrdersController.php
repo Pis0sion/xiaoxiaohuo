@@ -61,4 +61,10 @@ class IntegralOrdersController
         return $this->ordersRepositories->getAllOrderByConditions($request);
     }
 
+    // 查询订单详情
+    public function orderDetailsByUsers()
+    {
+        return $this->ordersRepositories->getOrderDetails();
+    }
+
 }

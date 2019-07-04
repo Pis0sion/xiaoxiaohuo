@@ -426,14 +426,17 @@ class UsersRepositories
      * 添加地址
      * @param $request
      * @param $regions
+     * @param \Closure $is_default
      * @return array
      * @throws ParameterException
      */
-    public function addUsersConsigns($request,$regions)
+    public function addUsersConsigns($request,$regions,\Closure $is_default)
     {
         (new ConsignsValidate())->goCheck();
 
         extract($this->obtainRegionsByCountyId($regions,$request->uc_county));
+
+        $is_default($request);
 
         $userConsign = array(
             'uc_consignee'  => $request->uc_consignee ,
@@ -445,6 +448,7 @@ class UsersRepositories
             'uc_county'  => $countyRes->areaname ,
             'uc_location'  => $request->uc_location ,
             'uc_phone'  => $request->uc_phone ,
+            'uc_is_default' => $request->is_default ,
             'uc_state'  => 1 ,
             'uc_create_ip'  => $request->ip() ,
             'uc_mold'  => 'user' ,
@@ -488,16 +492,19 @@ class UsersRepositories
      * @param $request
      * @param $consigns
      * @param \Closure $strategy
+     * @param \Closure $is_default
      * @return array
      * @throws ParameterException
      */
-    public function editConsignsToDefault($request,$consigns,\Closure $strategy)
+    public function editConsignsToDefault($request,$consigns,\Closure $strategy,\Closure $is_default)
     {
         (new ConsignsValidate())->goCheck();
         if($consigns->isEmpty() || ($consigns->uc_state != 1)) {
             throw new ParameterException(['msg' => '默认地址不存在或状态不正常']);
         }
         $strategy($consigns);
+
+        $is_default($request);
 
         ($request->uc_consignee != $consigns->uc_consignee) && ($consigns->uc_consignee = $request->uc_consignee) ;
         ($request->uc_phone != $consigns->uc_phone) && ($consigns->uc_phone = $request->uc_phone) ;
@@ -510,6 +517,7 @@ class UsersRepositories
             $consigns->uc_province = $provinceRes->areaname ;
             $consigns->uc_city = $cityRes->areaname ;
             $consigns->uc_county = $countyRes->areaname ;
+            $consigns->uc_is_default = $request->is_default ;
         }
 
         if($consigns->save()){
