@@ -163,9 +163,9 @@ class IntegralRepositories
         //  检测分类合法
         $isLegal($multiple);
         //  开启事务
-        Db::startTrans();
+   //     Db::startTrans();
 
-        try{
+        //try{
             //  实例化该商品
             $malls = IntegralMalls::where('goods_id', $request->goods_id)->lock(true)->findOrEmpty();
             //  检测商品
@@ -206,14 +206,14 @@ class IntegralRepositories
                 // 减去积分
                 Accounts::where('uid',app()->usersInfo->id)->setField('ua_integral_value',bcsub($ua_integral_value,$order->order_integral,2));
 
-                Db::commit();
+               // Db::commit();
 
                 //  订单写入队列
                 $this->writeQueue(compact('order_sn'));
 
                 return Utils::renderJson(compact('order'));
             }
-        }catch (\Throwable $e){
+/*        }catch (\Throwable $e){
             //  事务回滚
             Db::rollback();
 
@@ -221,7 +221,7 @@ class IntegralRepositories
 
                 throw $e ;
 
-        }
+        }*/
 
         throw new ParameterException(['msg' => '下单失败']);
     }
