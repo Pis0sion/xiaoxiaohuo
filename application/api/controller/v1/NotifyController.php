@@ -4,7 +4,6 @@
 namespace app\api\controller\v1;
 
 use app\api\repositories\NotifyRepositories;
-use think\Request;
 
 /**
  * Class NotifyController
@@ -23,10 +22,12 @@ class NotifyController
     {
         $this->notify = $notify;
     }
-
+    
     /**
      * 订单回调
-     * @param Request $request
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \app\lib\exception\ParameterException
      * @route("api/v1/orders/notify","post")
      *
      */
