@@ -5,6 +5,7 @@ namespace app\api\service\payments;
 
 
 use Omnipay\Omnipay;
+use think\Db;
 
 class PayOfAliPay extends IPayChannels
 {
@@ -51,6 +52,8 @@ class PayOfAliPay extends IPayChannels
         $request = $this->gateWay->completePurchase();
         $request->setParams($_POST); //Optional
 
+        Db::startTrans();
+
         try {
             /** @var \Omnipay\Alipay\Responses\AopCompletePurchaseResponse $response */
             $response = $request->send();
@@ -63,6 +66,8 @@ class PayOfAliPay extends IPayChannels
 
                 $success($formNo);
 
+                Db::commit();
+
                 die('success'); //The response should be 'success' only
 
             }else{
@@ -70,12 +75,15 @@ class PayOfAliPay extends IPayChannels
                  * Payment is not successful
                  */
                 $fail();
+
+                Db::rollback();
                 die('fail');
             }
         } catch (\Throwable $e) {
             /**
              * Payment is not successful
              */
+            Db::rollback();
             die('fail');
         }
     }
