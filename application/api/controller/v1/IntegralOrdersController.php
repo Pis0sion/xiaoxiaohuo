@@ -5,8 +5,6 @@ namespace app\api\controller\v1;
 
 
 use app\api\repositories\OrdersByIntegralRepositories;
-use app\api\service\PayService;
-use app\common\model\OrdersByIntegral;
 use app\lib\exception\ParameterException;
 use think\Request;
 

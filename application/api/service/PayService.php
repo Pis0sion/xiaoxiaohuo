@@ -49,4 +49,18 @@ class PayService {
         return $payChannel->purchase($order);
     }
 
+    /**
+     * 处理回调
+     * @param \Closure $success
+     * @param \Closure $fail
+     * @return mixed
+     * @throws ParameterException
+     * @throws \ReflectionException
+     */
+    public function payNotify(\Closure $success,\Closure $fail)
+    {
+        $payChannel = app("PayService",[$this->initClass("alipay",$this->supportedClass())]);
+        return $payChannel->doNotify($success,$fail);
+    }
+
 }

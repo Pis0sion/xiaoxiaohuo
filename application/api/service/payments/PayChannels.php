@@ -32,4 +32,15 @@ class PayChannels
         return $this->payChannel->payOrder($order);
     }
 
+    /**
+     * 处理回调
+     * @param \Closure $success
+     * @param \Closure $fail
+     * @return mixed
+     */
+    public function doNotify(\Closure $success,\Closure $fail)
+    {
+        return $this->payChannel->doNotify($success,$fail);
+    }
+
 }

@@ -30,4 +30,11 @@ abstract class IPayChannels
      */
     abstract public function payOrder(OrdersByIntegral $orders);
 
+    /**
+     * @param \Closure $success
+     * @param \Closure $fail
+     * @return mixed
+     */
+    abstract function doNotify(\Closure $success,\Closure $fail);
+
 }

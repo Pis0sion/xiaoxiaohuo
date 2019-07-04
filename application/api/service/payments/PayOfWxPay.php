@@ -37,4 +37,39 @@ class PayOfWxPay extends IPayChannels
         $response = $request->send();
         return $response->getQrCode();
     }
+
+    /**
+     * 处理回调
+     * @param \Closure $success
+     * @param \Closure $fail
+     */
+    public function doNotify(\Closure $success,\Closure $fail)
+    {
+        $request = $this->gateWay->completePurchase();
+        $request->setParams($request()->post()); //Optional
+
+        try {
+            /** @var \Omnipay\Alipay\Responses\AopCompletePurchaseResponse $response */
+            $response = $request->send();
+
+            if($response->isPaid()){
+                /**
+                 * Payment is successful
+                 */
+                $success();
+                die('success'); //The response should be 'success' only
+            }else{
+                /**
+                 * Payment is not successful
+                 */
+                $fail();
+                die('fail');
+            }
+        } catch (\Throwable $e) {
+            /**
+             * Payment is not successful
+             */
+            die('fail');
+        }
+    }
 }

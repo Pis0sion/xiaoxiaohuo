@@ -126,6 +126,4 @@ class IntegralController
                 throw new ParameterException(['msg' => '库存不足']);
         });
     }
-
-
 }
