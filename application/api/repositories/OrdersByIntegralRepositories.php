@@ -45,31 +45,13 @@ class OrdersByIntegralRepositories
             throw new ParameterException(['msg' => '订单状态不正确']);
         }
 
-        //  获取商品id
-        $goods_id = $order->hasManyIntegralGoods->goods_id ;
-        //  购买数量
-        $purchase_count = $order->hasManyIntegralGoods->num ;
-
-        Db::startTrans();
-
         try{
-            //  查询该商品的库存量
-            $stock = IntegralMalls::where("goods_id",$goods_id)->lock(true)->value('goods_stock');
-            //  检测库存量
-            $isEnough($stock,$purchase_count);
-            //  查询该用户积分
-            $userIntegral = Accounts::where('uid',$order->user_id)->lock(true)->value('ua_integral_value');
-            //  检测积分
-            $isEnough($userIntegral,$order->order_integral);
+
             //  吊起支付
             $payUrl = (new PayService())->payAction($request->type , $order);
 
-            if($payUrl) {
-                //  提交事务
-                Db::commit();
+            return Utils::renderJson(compact('payUrl'));
 
-                return Utils::renderJson(compact('payUrl'));
-            }
         }catch (\Throwable $e) {
 
             Db::rollback();
