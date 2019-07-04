@@ -118,7 +118,7 @@ class IntegralController
     public function placeOrders(Request $request)
     {
         return $this->integral->placeOrders($request,function($result){
-            if(!$result)
+            if($result->isEmpty())
                 throw new ParameterException(['msg' => '数据错误，请联系客户']);
         },function($num,$stock){
             if($num >= $stock)

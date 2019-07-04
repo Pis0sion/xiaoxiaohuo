@@ -156,8 +156,6 @@ class IntegralRepositories
         (new PlaceOrdersValidate())->goCheck();
         // 获取地址
         $consigns = app()->usersInfo->hasUsersConsigns()->where('uc_id', $request->uc_id)->findOrEmpty();
-
-
         // 检测地址
         $isLegal($consigns);
         halt($consigns);
