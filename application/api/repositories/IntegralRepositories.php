@@ -208,6 +208,7 @@ class IntegralRepositories
 
                // Db::commit();
 
+                $order_sn = $order->order_sn ;
                 //  订单写入队列
                 $this->writeQueue(compact('order_sn'));
 
