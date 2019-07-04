@@ -51,7 +51,7 @@ class PayOfAliPay extends IPayChannels
     {
 
         $success("A704136792309727");
-
+        die('success');
         $request = $this->gateWay->completePurchase();
         $request->setParams($_POST); //Optional
 
