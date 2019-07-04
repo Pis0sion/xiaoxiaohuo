@@ -5,13 +5,9 @@ namespace app\api\repositories;
 
 use app\api\service\PayService;
 use app\api\utils\Utils;
-use app\common\model\Accounts;
-use app\common\model\IntegralMalls;
 use app\common\model\OrdersByIntegral;
 use app\common\validate\PayOrdersValidate;
 use app\lib\exception\ParameterException;
-use think\Db;
-use think\facade\Log;
 
 /**
  * 订单仓库
@@ -23,7 +19,6 @@ class OrdersByIntegralRepositories
     /**
      * 支付
      * @param $request
-     * @param \Closure $isEnough
      * @return array
      * @throws ParameterException
      * @throws \Throwable
@@ -31,7 +26,7 @@ class OrdersByIntegralRepositories
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public function payOrders($request,\Closure $isEnough)
+    public function payOrders($request)
     {
         (new PayOrdersValidate())->goCheck();
 
@@ -46,16 +41,13 @@ class OrdersByIntegralRepositories
         }
 
         try{
-
             //  吊起支付
             $payUrl = (new PayService())->payAction($request->type , $order);
 
             return Utils::renderJson(compact('payUrl'));
 
         }catch (\Throwable $e) {
-
-            Db::rollback();
-
+            
             if($e instanceof ParameterException)
 
                 throw $e ;

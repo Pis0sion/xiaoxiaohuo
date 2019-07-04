@@ -47,10 +47,7 @@ class IntegralOrdersController
      */
     public function payAction(Request $request)
     {
-        return $this->ordersRepositories->payOrders($request,function($num1,$num2){
-            if ($num1 < $num2)
-                throw new ParameterException(['msg' => '用户积分不足，或者商品已买完']);
-        });
+        return $this->ordersRepositories->payOrders($request);
     }
 
     /**
