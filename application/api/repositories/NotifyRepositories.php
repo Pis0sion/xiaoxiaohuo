@@ -12,6 +12,12 @@ use app\common\model\OrdersByIntegral;
  */
 class NotifyRepositories
 {
+    /**
+     * 处理回调
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \app\lib\exception\ParameterException
+     */
     public function doOrderNotify()
     {
         return (new PayService())->payNotify(function($formNo){
@@ -26,6 +32,8 @@ class NotifyRepositories
             $orders->save();
 
         },function(){
+
+            // TODO: 记录日志
 
         });
     }
