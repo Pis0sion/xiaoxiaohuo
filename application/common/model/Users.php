@@ -185,6 +185,17 @@ class Users extends Model
     }
 
     /**
+     * 添加积分记录
+     * @param $records
+     * @return false|Model
+     */
+    public function addIntegralRecords($records)
+    {
+        return $this->integralLogs()->save($records);
+    }
+
+
+    /**
      * 推广奖励
      * @return HasMany
      */

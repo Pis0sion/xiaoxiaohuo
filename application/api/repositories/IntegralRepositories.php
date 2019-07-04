@@ -206,6 +206,8 @@ class IntegralRepositories
                 IntegralMalls::where("goods_id",$request->goods_id)->setField('goods_stock',bcsub($malls->goods_stock,$request->count,2));
                 // 减去积分
                 Accounts::where('uid',app()->usersInfo->id)->setField('ua_integral_value',bcsub($ua_integral_value,$order->order_integral,2));
+                //  TODO: 积分操作日志
+                $this->deductUserIntegral($order->id,$order->order_integral)->call(app()->usersInfo);
 
                 Db::commit();
 
@@ -266,6 +268,27 @@ class IntegralRepositories
                 'num' => $num,
             ];
             return $this->addRelationsToGoods($relations);
+        };
+    }
+
+    /**
+     * 添加积分记录
+     * @param $order_id
+     * @param $score
+     * @return mixed
+     */
+    private function deductUserIntegral($order_id,$score)
+    {
+        return function()use($order_id,$score){
+            //  积分记录
+            $records = [
+                'o_id' => $order_id,
+                'desc' => "积分商城兑换",
+                'type' => 3,
+                'number' => "-".$score,
+                'symbol' => 2,
+            ];
+            return $this->addIntegralRecords($records);
         };
     }
 
