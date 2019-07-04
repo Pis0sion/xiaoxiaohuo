@@ -157,10 +157,10 @@ class IntegralRepositories
         // 获取地址
         $consigns = app()->usersInfo->hasUsersConsigns()->where('uc_id', $request->uc_id)->findOrEmpty();
 
-        halt($consigns);
+
         // 检测地址
         $isLegal($consigns);
-
+        halt($consigns);
         $multiple = MultipleTypes::where('id', $request->mid)->findOrEmpty();
         //  检测分类合法
         $isLegal($multiple);
