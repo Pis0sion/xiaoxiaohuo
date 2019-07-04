@@ -22,7 +22,7 @@ class NotifyController
     {
         $this->notify = $notify;
     }
-    
+
     /**
      * 订单回调
      * @return mixed
