@@ -517,8 +517,8 @@ class UsersRepositories
             $consigns->uc_province = $provinceRes->areaname ;
             $consigns->uc_city = $cityRes->areaname ;
             $consigns->uc_county = $countyRes->areaname ;
-            $consigns->uc_is_default = $request->is_default ;
         }
+        $consigns->uc_is_default = $request->is_default ;
 
         if($consigns->save()){
             return Utils::renderJson("修改成功");
