@@ -158,27 +158,33 @@ class IntegralRepositories
         $consigns = app()->usersInfo->hasUsersConsigns()->where('uc_id', $request->uc_id)->findOrEmpty();
         // 检测地址
         $isLegal($consigns);
-        halt($consigns);
+
         $multiple = MultipleTypes::where('id', $request->mid)->findOrEmpty();
         //  检测分类合法
         $isLegal($multiple);
-        //  实例化该商品
-        $malls = IntegralMalls::where('goods_id', $request->goods_id)->findOrEmpty();
-        //  检测商品
-        $isLegal($malls);
-        //  检测库存
-        $isEnough($request->count, $malls->goods_stock);
-        //  实例化商品积分服务类
-        $mode = app("Mode", [$request->count, $malls]);
-        //  导入选择的积分分区
-        $mode = $this->payCalIntegrals($multiple)->call($mode);
-        //  判断选择的积分是否满足
-        if (!$mode->isPayable(app()->usersInfo->uAccount->ua_integral_value)) {
-            throw new ParameterException(['msg' => '积分不足']);
-        }
+        //  开启事务
         Db::startTrans();
-        try {
+
+        try{
+            //  实例化该商品
+            $malls = IntegralMalls::where('goods_id', $request->goods_id)->lock(true)->findOrEmpty();
+            //  检测商品
+            $isLegal($malls);
+            //  检测库存
+            $isEnough($request->count, $malls->goods_stock);
+            //  实例化商品积分服务类
+            $mode = app("Mode", [$request->count, $malls]);
+            //  导入选择的积分分区
+            $mode = $this->payCalIntegrals($multiple)->call($mode);
+            //  获取用户的积分
+            $ua_integral_value = Accounts::where('uid',app()->usersInfo->id)->lock(true)->value('ua_integral_value');
+            //  判断选择的积分是否满足
+            if (!$mode->isPayable($ua_integral_value)) {
+                throw new ParameterException(['msg' => '积分不足']);
+            }
+
             $orders = [
+
                 'order_sn' => Utils::makeResquestNo(),
                 'goods_price' => $mode->getTotalMoney(),
                 'shipping_fee' => $mode->getFreight(),
@@ -189,18 +195,34 @@ class IntegralRepositories
                 'shipping_mobile' => $consigns->uc_phone,
                 'shipping_addr' => $consigns->uc_province . $consigns->uc_city . $consigns->uc_county . $consigns->uc_location,
                 'remark' => $request->param('remark',''),
+
             ];
 
             if ($order = app()->usersInfo->placeOrders($orders)) {
+
                 $this->addRelationsGoods($malls, $request->count)->call($order);
-                //  TODO:  减库存  减积分
+                // 减库存
+                IntegralMalls::where("goods_id",$request->goods_id)->setField('goods_stock',bcsub($malls->goods_stock,$request->count,2));
+                // 减去积分
+                Accounts::where('uid',app()->usersInfo->id)->setField('ua_integral_value',bcsub($ua_integral_value,$order->order_integral,2));
 
                 Db::commit();
+
+                //  订单写入队列
+                $this->writeQueue(compact('order_sn'));
+
                 return Utils::renderJson(compact('order'));
             }
-        } catch (\Throwable $e) {
+        }catch (\Throwable $e){
+            //  事务回滚
             Db::rollback();
+
+            if($e instanceof ParameterException)
+
+                throw $e ;
+
         }
+
         throw new ParameterException(['msg' => '下单失败']);
     }
 
@@ -243,6 +265,34 @@ class IntegralRepositories
             ];
             return $this->addRelationsToGoods($relations);
         };
+    }
+
+    /**
+     * 写入队列
+     * @param $data
+     */
+    private function writeQueue($data)
+    {
+        $stomp = new \Stomp('tcp://47.95.9.36:61613','pis0sion','zihuang2010=-0');
+
+        $queue = "/queue/orderIsPay" ;
+
+        try {
+            $stomp->begin("trans");
+
+            $stomp->send($queue, json_encode($data), [
+                'PERSISTENT' => 'true',
+                'AMQ_SCHEDULED_DELAY' => 20 * 60 * 1000,
+            ]);
+
+            $stomp->commit("trans");
+
+        }catch (\Throwable $e){
+
+            $stomp->abort('trans');
+
+            Utils::LogError(json_encode($data));
+        }
     }
 
 

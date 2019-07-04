@@ -65,26 +65,10 @@ class OrdersByIntegralRepositories
             $payUrl = (new PayService())->payAction($request->type , $order);
 
             if($payUrl) {
-                // 减库存
-                IntegralMalls::where("goods_id",$goods_id)->setField('goods_stock',bcsub($stock,$purchase_count,2));
-                // 减去积分
-                Accounts::where('uid',$order->user_id)->setField('ua_integral_value',bcsub($userIntegral,$order->order_integral,2));
-                // 修改支付状态 支付中
-                $order->order_status = 20 ;
-
-                $order->save();
-
-                // TODO:  添加日志
-
-
-
-
+                //  提交事务
                 Db::commit();
-                //  订单写入队列
-                $this->writeQueue(compact('order_sn'));
 
                 return Utils::renderJson(compact('payUrl'));
-
             }
         }catch (\Throwable $e) {
 
@@ -97,34 +81,6 @@ class OrdersByIntegralRepositories
 
         throw new ParameterException(['msg' => '支付失败']);
 
-    }
-
-    /**
-     * 写入队列
-     * @param $data
-     */
-    private function writeQueue($data)
-    {
-        $stomp = new \Stomp('tcp://47.95.9.36:61613','pis0sion','zihuang2010=-0');
-
-        $queue = "/queue/orderIsPay" ;
-
-        try {
-            $stomp->begin("trans");
-
-            $stomp->send($queue, json_encode($data), [
-                'PERSISTENT' => 'true',
-                'AMQ_SCHEDULED_DELAY' => 20 * 60 * 1000,
-            ]);
-
-            $stomp->commit("trans");
-
-        }catch (\Throwable $e){
-
-            $stomp->abort('trans');
-
-            Utils::LogError(json_encode($data));
-        }
     }
 
     /**
