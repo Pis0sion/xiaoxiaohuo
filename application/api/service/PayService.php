@@ -53,13 +53,14 @@ class PayService {
      * 处理回调
      * @param \Closure $success
      * @param \Closure $fail
+     * @param string $type
      * @return mixed
      * @throws ParameterException
      * @throws \ReflectionException
      */
-    public function payNotify(\Closure $success,\Closure $fail)
+    public function payNotify(\Closure $success,\Closure $fail,$type = "alipay")
     {
-        $payChannel = app("PayService",[$this->initClass("alipay",$this->supportedClass())]);
+        $payChannel = app("PayService",[$this->initClass($type,$this->supportedClass())]);
         return $payChannel->doNotify($success,$fail);
     }
 
