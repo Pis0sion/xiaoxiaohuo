@@ -41,12 +41,10 @@ class OrdersByIntegralRepositories
         $order = OrdersByIntegral::where("order_sn",$order_sn)
             ->where('order_sn',10)->findOrEmpty();
 
-        if($order->isEmpty())
-        {
-            halt(123456);
+        if($order->isEmpty()) {
             throw new ParameterException(['msg' => '订单状态不正确']);
         }
-
+        
         //  获取商品id
         $goods_id = $order->hasManyIntegralGoods->goods_id ;
         //  购买数量
