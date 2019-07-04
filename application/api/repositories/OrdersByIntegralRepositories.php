@@ -41,8 +41,10 @@ class OrdersByIntegralRepositories
         $order = OrdersByIntegral::where("order_sn",$order_sn)
             ->where('order_sn',10)->findOrEmpty();
 
+        halt($order);
         if(empty($order))
         {
+            halt(123456);
             throw new ParameterException(['msg' => '订单状态不正确']);
         }
 
