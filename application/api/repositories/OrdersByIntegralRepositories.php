@@ -44,7 +44,7 @@ class OrdersByIntegralRepositories
         if($order->isEmpty()) {
             throw new ParameterException(['msg' => '订单状态不正确']);
         }
-        
+
         //  获取商品id
         $goods_id = $order->hasManyIntegralGoods->goods_id ;
         //  购买数量
@@ -75,6 +75,9 @@ class OrdersByIntegralRepositories
                 $order->save();
 
                 // TODO:  添加日志
+
+
+
 
                 Db::commit();
                 //  订单写入队列
@@ -135,8 +138,7 @@ class OrdersByIntegralRepositories
         $orders = app()->usersInfo->hasIntegralOrders()
             ->field("order_id,order_sn,order_status,goods_price,order_amount,order_integral,create_time");
 
-        if($order_status)
-        {
+        if($order_status) {
             $orders = $orders->where('order_status',$order_status);
         }
 

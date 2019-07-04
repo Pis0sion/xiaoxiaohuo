@@ -5,7 +5,7 @@ namespace app\api\repositories;
 
 
 use app\api\utils\Utils;
-use app\common\model\{MultipleTypes, IntegralMalls};
+use app\common\model\{Accounts, MultipleTypes, IntegralMalls};
 use app\common\validate\OrdersValidate;
 use app\common\validate\PlaceOrdersValidate;
 use app\lib\exception\ParameterException;
@@ -156,6 +156,8 @@ class IntegralRepositories
         (new PlaceOrdersValidate())->goCheck();
         // 获取地址
         $consigns = app()->usersInfo->hasUsersConsigns()->where('uc_id', $request->uc_id)->findOrEmpty();
+
+        halt($consigns);
         // 检测地址
         $isLegal($consigns);
 
@@ -167,7 +169,7 @@ class IntegralRepositories
         //  检测商品
         $isLegal($malls);
         //  检测库存
-        $isEnough($request->number, $malls->goods_stock);
+        $isEnough($request->count, $malls->goods_stock);
         //  实例化商品积分服务类
         $mode = app("Mode", [$request->count, $malls]);
         //  导入选择的积分分区
@@ -193,6 +195,8 @@ class IntegralRepositories
 
             if ($order = app()->usersInfo->placeOrders($orders)) {
                 $this->addRelationsGoods($malls, $request->count)->call($order);
+                //  TODO:  减库存  减积分
+
                 Db::commit();
                 return Utils::renderJson(compact('order'));
             }
