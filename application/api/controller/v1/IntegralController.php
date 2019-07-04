@@ -108,6 +108,7 @@ class IntegralController
      * @param Request $request
      * @return array
      * @throws ParameterException
+     * @throws \Throwable
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
