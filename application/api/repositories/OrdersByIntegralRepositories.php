@@ -20,12 +20,6 @@ use think\facade\Log;
  */
 class OrdersByIntegralRepositories
 {
-
-    public function getOrderInfo()
-    {
-        return "456789456789456789";
-    }
-
     /**
      * 支付
      * @param $request
@@ -43,7 +37,10 @@ class OrdersByIntegralRepositories
 
         $order_sn = $request->order_sn ;
 
-        $order = OrdersByIntegral::where("order_sn",$order_sn)->findOrFail();
+        //  获取该订单的状态   只有待支付状态
+        $order = OrdersByIntegral::where("order_sn",$order_sn)
+            ->where('order_sn',10)->findOrEmpty();
+        
         //  获取商品id
         $goods_id = $order->hasManyIntegralGoods->goods_id ;
         //  购买数量
@@ -119,23 +116,8 @@ class OrdersByIntegralRepositories
 
             $stomp->abort('trans');
 
-            $this->LogError(json_encode($data));
+            Utils::LogError(json_encode($data));
         }
-    }
-
-    /**
-     * 记录失败的用户
-     * @param $msg
-     */
-    public function LogError($msg)
-    {
-        Log::init([
-            'type'  =>  'File',
-            'path'  =>  app()->getRuntimePath(),
-            'level' => ['error']
-        ]);
-
-        Log::record($msg,'error');
     }
 
     /**
@@ -146,7 +128,8 @@ class OrdersByIntegralRepositories
     {
         $order_status = $request->status ;
 
-        $orders = app()->usersInfo->hasIntegralOrders()->field("order_id,order_sn,order_status,goods_price,order_amount,order_integral,create_time");
+        $orders = app()->usersInfo->hasIntegralOrders()
+            ->field("order_id,order_sn,order_status,goods_price,order_amount,order_integral,create_time");
 
         if($order_status)
         {

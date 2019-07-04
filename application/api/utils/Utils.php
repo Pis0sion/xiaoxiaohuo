@@ -6,6 +6,7 @@ namespace app\api\utils;
 
 use app\api\service\QueuesService;
 use app\api\service\TokensService;
+use think\facade\Log;
 
 class Utils
 {
@@ -98,6 +99,7 @@ class Utils
     }
 
     /**
+     * 分页处理
      * @return \Closure
      */
     public static function render()
@@ -112,6 +114,19 @@ class Utils
 
             return $data ;
         };
+    }
+
+    // LogError
+
+    public static function LogError($msg)
+    {
+        Log::init([
+            'type'  =>  'File',
+            'path'  =>  app()->getRuntimePath(),
+            'level' => ['error']
+        ]);
+
+        Log::record($msg,'error');
     }
 
 }
