@@ -50,7 +50,7 @@ class PayOfAliPay extends IPayChannels
     public function doNotify(\Closure $success,\Closure $fail)
     {
 
-        die("123456123");
+        die("回调");
 
         $request = $this->gateWay->completePurchase();
         $request->setParams($_POST); //Optional
