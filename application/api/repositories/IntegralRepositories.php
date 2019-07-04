@@ -207,7 +207,7 @@ class IntegralRepositories
                 // 减去积分
                 Accounts::where('uid',app()->usersInfo->id)->setField('ua_integral_value',bcsub($ua_integral_value,$order->order_integral,2));
                 //  TODO: 积分操作日志
-                $this->deductUserIntegral($order->id,$order->order_integral)->call(app()->usersInfo);
+                $this->deductUserIntegral($order->order_id,$order->order_integral)->call(app()->usersInfo);
 
               //  Db::commit();
 
