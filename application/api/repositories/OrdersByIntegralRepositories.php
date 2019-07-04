@@ -40,7 +40,12 @@ class OrdersByIntegralRepositories
         //  获取该订单的状态   只有待支付状态
         $order = OrdersByIntegral::where("order_sn",$order_sn)
             ->where('order_sn',10)->findOrEmpty();
-        
+
+        if(empty($order))
+        {
+            throw new ParameterException(['msg' => '订单状态不正确']);
+        }
+
         //  获取商品id
         $goods_id = $order->hasManyIntegralGoods->goods_id ;
         //  购买数量
