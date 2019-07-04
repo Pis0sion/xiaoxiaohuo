@@ -34,7 +34,7 @@ class OrdersByIntegralRepositories
 
         //  获取该订单的状态   只有待支付状态
         $order = OrdersByIntegral::where("order_sn",$order_sn)
-            ->where('order_sn',10)->findOrEmpty();
+            ->where('order_status',10)->findOrEmpty();
 
         if($order->isEmpty()) {
             throw new ParameterException(['msg' => '订单状态不正确']);
@@ -47,7 +47,7 @@ class OrdersByIntegralRepositories
             return Utils::renderJson(compact('payUrl'));
 
         }catch (\Throwable $e) {
-            
+
             if($e instanceof ParameterException)
 
                 throw $e ;
